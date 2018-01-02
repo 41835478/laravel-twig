@@ -56,7 +56,6 @@ class SuperBuyOpenApi
         }
     }
 
-
     function getSign()
     {
         return "5013304f60510d9621cbe220434ae6e8";

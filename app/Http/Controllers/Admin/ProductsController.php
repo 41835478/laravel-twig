@@ -22,7 +22,7 @@ class ProductsController extends Controller
         $free_shipment = $request->input("free_shipment", ""); // 1 免国内运费
         $start_price = $request->input("start_price", "");
         $end_price = $request->input("end_price", "");
-        $platform = $request->input("platform",1); // 1:淘宝;2:天 猫;3京东；10:淘宝联盟
+        $platform = $request->input("platform",2); // 1:淘宝;2:天 猫;3京东；10:淘宝联盟
         $lang_type = $request->input("lang_type", "");
 
         if (empty($keywords)) {
