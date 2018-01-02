@@ -24,7 +24,7 @@ class ProductsController extends Controller
         $end_price = $request->input("end_price", "");
         $platform = $request->input("platform",1); // 1:淘宝;2:天 猫;3京东；10:淘宝联盟
         $lang_type = $request->input("lang_type", "");
-        
+
         if (empty($keywords)) {
             return response()->json(["status" => false, "errors" => "keywords is empty"]);
         }
@@ -39,7 +39,7 @@ class ProductsController extends Controller
         if (!empty($free_shipment)) {
             $query_params["freeShipment"] = $free_shipment;
         }
-        if (!empty($platform_name)) {
+        if (!empty($platform)) {
             $query_params["platform"] = $platform;
         }
         if (!empty($lang_type)) {
