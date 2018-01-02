@@ -1,0 +1,69 @@
+{% extends 'theme.twig' %}
+
+{% block header_meta %}
+<title>Products</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="renderer" content="webkit">
+<!--<link rel="shortcut icon" href="favicon.ico">-->
+<link rel="stylesheet" type="text/css" href="http://china.buckydrop.com/china.buckydrop.com/css/common/global.css">
+<link rel="stylesheet" type="text/css" href="http://china.buckydrop.com/china.buckydrop.com/css/common/iconfont.css">
+<link rel="stylesheet" type="text/css" href="http://china.buckydrop.com/china.buckydrop.com/css/products/products.css">
+<script src="http://china.buckydrop.com/china.buckydrop.com/resource/vendor/jquery-3.2.1.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<div class="w-content">
+
+    <!-- crumbs -->
+    <div class="w-centerBlock c-crumbs">
+        <a class="iconfont icon-shouye" href="#">Home</a>
+        <i class="iconfont icon-xiangyoujiantou"></i>
+        <i>Products</i>
+    </div>
+
+    <!-- filter -->
+    <div class="c-products-filter w-centerBlock">
+        <button class="active c-products-filter-sort first-button">Raking</button>
+        <button class="false c-products-filter-sort">Sales</button>
+        <div class=" c-products-filter-sort">
+            Price
+            <div>
+                <a class="">Price: High to Low</a>
+                <a class="">Price: Low to High</a>
+            </div>
+        </div>
+        <div class="c-products-filter-price clearfix">
+            <i>CN ￥</i>
+            <input type="text" value="" name="">
+            <span>-</span>
+            <i>CN ￥</i>
+            <input type="text" value="" name="">
+            <button>OK</button>
+        </div>
+    </div>
+
+    <!-- Products -->
+    <div class="w-centerBlock clearfix">
+        {% for i in range(1, 12) %}
+            {% include "product-grid-item" %}
+        {% endfor %}
+
+    </div>
+
+    <!-- pager -->
+    <ol class="c-pager">
+        <li class="disabled iconfont icon-xiangzuojiantou"></li>
+        <li class="active">1</li>
+        <li>2</li>
+        <li>3</li>
+        <li class="disabled">...</li>
+        <li>10</li>
+        <li class="iconfont icon-xiangyoujiantou"></li>
+    </ol>
+</div>
+<div class="w-footer-padding"></div>
+{% endblock %}

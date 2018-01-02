@@ -1,0 +1,361 @@
+{% extends 'carts.twig' %}
+{% block body %}
+    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+    <script>
+        var CREATE_PAYMENT_URL = '/paypal/create-payment';
+        var EXECUTE_PAYMENT_URL = '/paypal/execute-payment';
+        paypal.Button.render({
+            env: 'sandbox', // Or 'sandbox'
+            commit: true, // Show a 'Pay Now' button
+            style: {
+                layout: 'vertical',  // horizontal | vertical
+                size: 'large',    // medium | large | responsive
+                shape: 'pill',      // pill | rect
+                color: 'gold'       // gold | blue | silver | black
+            },
+            // Specify allowed and disallowed funding sources
+            //
+            // Options:
+            // - paypal.FUNDING.CARD
+            // - paypal.FUNDING.CREDIT
+            // - paypal.FUNDING.ELV
+
+            funding: {
+                allowed: [paypal.FUNDING.CARD, paypal.FUNDING.CREDIT],
+                disallowed: []
+            },
+            payment: function () {
+                return paypal.request.post(CREATE_PAYMENT_URL).then(function (data) {
+                    return data.id;
+                });
+            },
+            onAuthorize: function (data) {
+                return paypal.request.post(EXECUTE_PAYMENT_URL, {
+                    paymentID: data.paymentID,
+                    payerID: data.payerID
+                }).then(function () {
+
+                    // The payment is complete!
+                    // You can now show a confirmation message to the customer
+
+                });
+            }
+
+        }, '#paypal-button');
+    </script>
+
+    <div class="main" role="main">
+        <div class="main__header">
+            <a href="/" class="logo logo--left">
+                <h1 class="logo__text">buckydrop </h1>
+            </a>
+            <ul class="breadcrumb ">
+                <li class="breadcrumb__item breadcrumb__item--completed">
+                    <a class="breadcrumb__link" href="/cart">Cart</a>
+                    <svg class="icon-svg icon-svg--size-10 breadcrumb__chevron-icon rtl-flip" role="img"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                        <path d="M2 1l1-1 4 4 1 1-1 1-4 4-1-1 4-4"></path>
+                    </svg>
+                </li>
+
+                <li class="breadcrumb__item breadcrumb__item--completed">
+                    <a class="breadcrumb__link" href="/checkout?step=contact_information">Customer information</a>
+                    <svg class="icon-svg icon-svg--size-10 breadcrumb__chevron-icon rtl-flip" role="img"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                        <path d="M2 1l1-1 4 4 1 1-1 1-4 4-1-1 4-4"></path>
+                    </svg>
+                </li>
+                <li class="breadcrumb__item breadcrumb__item--completed">
+                    <a class="breadcrumb__link" href="/checkout?step=shipping_method">Shipping method</a>
+                    <svg class="icon-svg icon-svg--size-10 breadcrumb__chevron-icon rtl-flip" role="img"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                        <path d="M2 1l1-1 4 4 1 1-1 1-4 4-1-1 4-4"></path>
+                    </svg>
+                </li>
+                <li class="breadcrumb__item breadcrumb__item--current">
+                    <span class="breadcrumb__text" aria-current="step">Payment method</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main__content">
+            <div class="step" data-step="payment_method">
+                <div class="step__sections">
+                    <div class="section">
+                        <div class="content-box">
+                            <div class="content-box__row content-box__row--tight-spacing-vertical content-box__row--secondary">
+                                <div class="review-block">
+                                    <div class="review-block__inner">
+                                        <div class="review-block__label">
+                                            Shipping address
+                                        </div>
+                                        <div class="review-block__content">
+                                            深圳前海跨海侠跨境电子商务有限公司, 深圳市龙华新区昌永路和平工业园金星大厦B区7楼 AB座5B shenzhen, 274409 Anhui,
+                                            China
+                                        </div>
+                                    </div>
+                                    <div class="review-block__link">
+                                        <a class="link--small"
+                                           href="/15928069/checkouts/b2cb2aadcd4bfa31f69f92a00881294b?step=contact_information">
+                                            {#<span aria-hidden="true">Edit</span>#}
+                                            {#<span class="visually-hidden">Edit shipping address</span>#}
+                                        </a></div>
+                                </div>
+
+                                <hr class="content-box__hr content-box__hr--tight">
+                                <div class="review-block">
+                                    <div class="review-block__inner">
+                                        <div class="review-block__label">
+                                            Shipping method
+                                        </div>
+                                        <div class="review-block__content">
+                                            Priority Mail International
+                                            ·
+                                            $102.54
+                                        </div>
+                                    </div>
+                                    <div class="review-block__link">
+                                        <a class="link--small"
+                                           href="/15928069/checkouts/b2cb2aadcd4bfa31f69f92a00881294b?step=shipping_method">
+                                            {#<span aria-hidden="true">Edit</span>#}
+                                            {#<span class="visually-hidden">Edit shipping method</span>#}
+                                        </a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="section section--reductions hidden-on-desktop">
+                        <div class="section__header">
+                            <h2 class="section__title">Discount</h2>
+                        </div>
+
+
+                    </div>
+
+
+                    <form data-payment-form="" class="edit_checkout animate-floating-labels"
+                          action="/15928069/checkouts/b2cb2aadcd4bfa31f69f92a00881294b" accept-charset="UTF-8"
+                          method="post"><input name="utf8" type="hidden" value="✓"><input type="hidden" name="_method"
+                                                                                          value="patch"><input
+                                type="hidden" name="authenticity_token"
+                                value="h+nWxHhpdOz/fiNRcW2cNGhjZjpRu87m94cqW8S4ERj34mc1oYv9IIcSc3IQNYsok3/XZyb1isbEgSsOSsj3Gw==">
+
+                        <input type="hidden" name="previous_step" id="previous_step" value="payment_method">
+                        <input type="hidden" name="step">
+                        <input type="hidden" name="s" id="s">
+
+                        <div class="section section--payment-method" data-payment-method="">
+                            <div class="section__header">
+                                <h2 class="section__title">Payment method</h2>
+                                <p class="section__text">
+                                    All transactions are secure and encrypted.
+                                </p>
+                            </div>
+
+                            <div class="section__content">
+
+                                <div data-payment-subform="required">
+                                    <div class="content-box">
+                                        <div class="radio-wrapper content-box__row " data-gateway-group="express"
+                                             data-select-gateway="113335820">
+                                            <input value="113335820" size="30" type="hidden"
+                                                   name="checkout[payment_gateway]" aria-expanded="false">
+
+                                            {#<label class="radio__label content-box__emphasis payment-method-wrapper"#}
+                                                   {#for="checkout_payment_gateway_113335820">#}
+                                                {#<div class="radio__label__primary">#}
+                                                    {#<img alt="PayPal" class="offsite-payment-gateway-logo"#}
+                                                         {#src="//cdn.shopify.com/s/assets/checkout/offsite-gateway-logos/paypal@2x-2cabd13111981089fdf7f9faee0ef21550690cd2d380dede9fb7bc8c1253b3c6.png">#}
+                                                    {#<span class="visually-hidden">PayPal</span>#}
+                                                {#</div>#}
+
+                                                {#<div class="radio__label__accessory">#}
+                                                    {#<span class="visually-hidden">Pay with:</span>#}
+
+                                                    {#<ul data-brand-icons-for-gateway="113335820">#}
+                                                        {#<li class="payment-icon payment-icon--visa"#}
+                                                            {#data-payment-icon="visa">#}
+                                                            {#<span class="visually-hidden">Visa</span>#}
+                                                        {#</li>#}
+                                                        {#<li class="payment-icon payment-icon--master"#}
+                                                            {#data-payment-icon="master">#}
+                                                            {#<span class="visually-hidden">Mastercard</span>#}
+                                                        {#</li>#}
+                                                        {#<li class="payment-icon payment-icon--american-express"#}
+                                                            {#data-payment-icon="american-express">#}
+                                                            {#<span class="visually-hidden">American Express</span>#}
+                                                        {#</li>#}
+                                                        {#<li class="payment-icon payment-icon--discover"#}
+                                                            {#data-payment-icon="discover">#}
+                                                            {#<span class="visually-hidden">Discover</span>#}
+                                                        {#</li>#}
+                                                    {#</ul>#}
+                                                {#</div>#}
+                                            {#</label>#}
+
+                                            <div id="paypal-button"></div>
+                                        </div>
+
+                                        {#<div class="radio-wrapper content-box__row content-box__row--secondary"#}
+                                             {#data-subfields-for-gateway="113335820"#}
+                                             {#id="payment-gateway-subfields-113335820">#}
+                                            {#<div class="blank-slate">#}
+                                                {#<i class="blank-slate__icon icon icon--offsite"></i>#}
+                                                {#<p>After clicking "Complete order", you will be redirected to PayPal to#}
+                                                    {#complete your purchase securely.</p>#}
+                                            {#</div>#}
+                                        {#</div>#}
+
+                                    </div>
+                                </div>
+                                <div data-payment-subform="gift_cards" class="hidden">
+                                    <input value="free" disabled="disabled" size="30" type="hidden"
+                                           name="checkout[payment_gateway]" aria-expanded="false">
+                                    <div class="content-box blank-slate">
+                                        <div class="content-box__row">
+                                            <i class="blank-slate__icon icon icon--free-tag"></i>
+                                            <p>Your order is covered by your gift cards.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-payment-subform="free" class="hidden">
+                                    <input value="free" disabled="disabled" size="30" type="hidden"
+                                           name="checkout[payment_gateway]" aria-expanded="false">
+                                    <div class="content-box blank-slate">
+                                        <div class="content-box__row">
+                                            <i class="blank-slate__icon icon icon--free-tag"></i>
+                                            <p>Your order is <strong>free</strong>. No payment is required.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="step__footer" data-step-footer="">
+                            <input type="hidden" name="checkout[total_price]" id="checkout_total_price" value="277154">
+                            <input type="hidden" name="complete" value="1">
+
+                            {#<button name="button" type="submit" class="step__footer__continue-btn btn ">#}
+                                {#<span class="btn__content">Complete order</span>#}
+                                {#<i class="btn__spinner icon icon--button-spinner"></i>#}
+                            {#</button>#}
+                            <a class="step__footer__previous-link" href="/checkout?step=shipping_method">
+                                <svg class="icon-svg icon-svg--color-accent icon-svg--size-10 previous-link__icon rtl-flip"
+                                     role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                                    <path d="M8 1L7 0 3 4 2 5l1 1 4 4 1-1-4-4"></path>
+                                </svg>
+                                <span class="step__footer__previous-link-content">Return to shipping method</span></a>
+                        </div>
+
+                        <input type="hidden" name="checkout[client_details][browser_width]" value="1903"><input
+                                type="hidden" name="checkout[client_details][browser_height]" value="949"><input
+                                type="hidden" name="checkout[client_details][javascript_enabled]" value="1"></form>
+                </div>
+
+            </div>
+
+
+        </div>
+        <div class="main__footer">
+            <div class="modals">
+                <div class="modal-backdrop" role="dialog" id="policy-32330828" aria-labelledby="policy-32330828-title"
+                     data-modal-backdrop="">
+                    <div class="modal">
+                        <div class="modal__header">
+                            <h1 class="modal__header__title" id="policy-32330828-title">
+                                Refund policy
+                            </h1>
+                            <div class="modal__close">
+                                <button type="button" class="icon icon--close-modal" data-modal-close="">
+          <span class="visually-hidden">
+            Close
+          </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal__content">
+                            <svg class="modal__loading-icon icon icon--spinner" width="32" height="32"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M32 16c0 8.837-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0v2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14h2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-backdrop" role="dialog" id="policy-32330892" aria-labelledby="policy-32330892-title"
+                     data-modal-backdrop="">
+                    <div class="modal">
+                        <div class="modal__header">
+                            <h1 class="modal__header__title" id="policy-32330892-title">
+                                Privacy policy
+                            </h1>
+                            <div class="modal__close">
+                                <button type="button" class="icon icon--close-modal" data-modal-close="">
+          <span class="visually-hidden">
+            Close
+          </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal__content">
+                            <svg class="modal__loading-icon icon icon--spinner" width="32" height="32"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M32 16c0 8.837-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0v2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14h2z"></path>
+                            </svg>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-backdrop" role="dialog" id="policy-32330956" aria-labelledby="policy-32330956-title"
+                     data-modal-backdrop="">
+                    <div class="modal">
+                        <div class="modal__header">
+                            <h1 class="modal__header__title" id="policy-32330956-title">
+                                Terms of service
+                            </h1>
+                            <div class="modal__close">
+                                <button type="button" class="icon icon--close-modal" data-modal-close="">
+          <span class="visually-hidden">
+            Close
+          </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal__content">
+                            <svg class="modal__loading-icon icon icon--spinner" width="32" height="32"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M32 16c0 8.837-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0v2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14h2z"></path>
+                            </svg>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div role="contentinfo" aria-label="Footer">
+                <ul class="policy-list">
+                    {#<li class="policy-list__item">#}
+                    {#<a title="Refund policy" data-modal="policy-32330828" data-close-text="Close" href="/15928069/policies/32330828.html">Refund policy</a>#}
+                    {#</li>#}
+                    {#<li class="policy-list__item">#}
+                    {#<a title="Privacy policy" data-modal="policy-32330892" data-close-text="Close" href="/15928069/policies/32330892.html">Privacy policy</a>#}
+                    {#</li>#}
+                    {#<li class="policy-list__item">#}
+                    {#<a title="Terms of service" data-modal="policy-32330956" data-close-text="Close" href="/15928069/policies/32330956.html">Terms of service</a>#}
+                    {#</li>#}
+                </ul>
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'theme.twig' %}
+{% block body_class %}template-page{% endblock %}
+{% block body %}
+<main class="wrapper main-content" role="main">
+        <div class="grid">
+            <div class="grid__item">
+                <div class="grid">
+                    <div class="grid__item post-large--two-thirds push--post-large--one-sixth">
+                        <div class="section-header">
+                            <h1 class="section-header--title">{{ page.title }}</h1>
+                        </div>
+                        <div class="rte">
+                            <!--关于我们的内容模板开始-->
+                                    {{ page.content }}
+                            <!--关于我们的内容模板结束-->
+
+                        </div>
+
+                        <div>
+                            {% if page.template_suffix %}
+                                <p></p>
+                                <p></p>
+                            <form method="post" action="/contact" id="contact_form" class="contact-form" accept-charset="UTF-8">
+                                <input type="hidden" value="contact" name="form_type">
+                                <input type="hidden" name="utf8" value="✓">
+
+                                {{ csrf_field() }}
+                                {%  if session_has("errors")%}
+                                    <p class="note form-error">
+                                        {{ session_get("errors") }}
+                                    </p>
+                                {% endif %}
+                                {% if session_has("success")%}
+                                    <p class="note form-success">
+                                        {{ session_get("success") }}
+                                    </p>
+                                {% endif %}
+
+                                <label for="ContactFormName" class="label--hidden">Name</label>
+                                <input type="text" id="ContactFormName" name="contact[name]" placeholder="Name" autocapitalize="words" value="">
+                                <label for="ContactFormEmail" class="label--hidden">Email</label>
+                                <input type="email" id="ContactFormEmail" name="contact[email]" placeholder="Email" autocorrect="off" autocapitalize="off" value="">
+                                <label for="ContactFormPhone" class="label--hidden">Phone Number</label>
+                                <input type="tel" id="ContactFormPhone" name="contact[phone-number]" placeholder="Phone Number" pattern="[0-9\-]*" value="">
+                                <label for="ContactFormMessage" class="label--hidden">Message</label>
+                                <textarea rows="10" id="ContactFormMessage" name="contact[body]" placeholder="Message"></textarea>
+                                <input type="submit" class="btn right" value="Send">
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}

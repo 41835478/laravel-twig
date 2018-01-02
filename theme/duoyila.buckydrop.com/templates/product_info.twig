@@ -1,0 +1,208 @@
+{% extends 'theme.twig' %}
+{% block body_class %}template-product"{% endblock %}
+{% block body %}
+
+    <main class="wrapper main-content" role="main">
+        <div class="grid">
+            <div class="grid__item">
+                <div id="shopify-section-product-template" class="shopify-section">
+                    <div itemscope="" itemtype="" id="ProductSection"
+                         data-section-id="product-template" data-section-type="product-template"
+                         data-image-zoom-type="lightbox" data-related-enabled="true">
+                        {#<meta itemprop="url" content="/products/air-foamposite-one-yellow">#}
+                        {#<meta itemprop="image"content="{{  }}">#}
+                        <div class="section-header section-header--breadcrumb">
+                            <nav class="breadcrumb" role="navigation" aria-label="breadcrumbs">
+                                <a href="/" title="Back to the frontpage">Home</a>
+                                {% if product_info["collection_url"] %}
+                                    <span aria-hidden="true" class="breadcrumb__sep">›</span>
+                                    <a href="{{  product_info["collection_url"] }}" title="">{{  product_info["collection_title"]}}</a>
+                                {% endif %}
+                                <span aria-hidden="true" class="breadcrumb__sep">›</span>
+                                <span>{{ product_info.product_name }}</span>
+                            </nav>
+                        </div>
+                        <div class="product-single">
+                            <div class="grid product-single__hero">
+                                <div class="grid__item post-large--one-half">
+                                    <div class="grid">
+                                        <div class="grid__item four-fifths product-single__photos" id="ProductPhoto">
+                                            <img src="{{ product_info.spu_imgs[0] }}"
+                                                 alt="{{ product_info.product_name }}" id="ProductPhotoImg"
+                                                 class="zoom-lightbox" data-image-id="23893705100">
+                                        </div>
+                                        <div class="grid__item one-fifth">
+                                            <ul class="grid product-single__thumbnails" id="ProductThumbs">
+                                                {% for spu_img in product_info.spu_imgs %}
+                                                    <li class="grid__item">
+                                                        <a data-image-id="23893705100" href="{{ spu_img }}"
+                                                           class="product-single__thumbnail">
+                                                            <img src="{{ spu_img }}"
+                                                                 alt="">
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
+
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="grid__item post-large--one-half">
+                                    {#<span class="h3" itemprop="brand">nike</span>#}
+
+                                    <h1 itemprop="name">{{ product_info.product_name }}</h1>
+                                    <div itemprop="offers" itemscope="" itemtype="http://schema.org/Offer">
+                                            <meta itemprop="priceCurrency" content="USD">
+                                            <link itemprop="availability" href="http://schema.org/InStock">
+                                            <div class="product-single__prices">
+                                                <span id="PriceA11y" class="visually-hidden">Regular price</span>
+                                                <span id="ProductPrice" class="product-single__price" itemprop="price"
+                                                      content="350.0">
+                                                </span>
+                                            </div>
+                                        {#销售属性开始#}
+                                        <form action="/cart/add" method="post" enctype="multipart/form-data"
+                                              id="AddToCartForm">
+                                            <div class="selector-wrapper">
+                                                {% for sku_option in product_sku_info.productProps %}
+                                                    <label for="productSelect-option-0">{{ sku_option["propName"] }}</label>
+                                                    <select class="single-option-selector" data-option="option1"
+                                                            id="productSelect-option-0">
+                                                        {% for option_value in  sku_option.data %}
+                                                            <option value="{{ option_value["valueId"] }}">{{ option_value["valueName"] }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                {% endfor %}
+                                            </div>
+
+                                            {{ csrf_field() }}
+                                            <input type="hidden" name="product_id" value="{{ product_info.id }}">
+                                            <input type="hidden" name="spuCode" id="spuCode" value="">
+
+                                            <div class="product-single__quantity">
+                                                <label for="Quantity">Quantity</label>
+                                                <input type="number" id="Quantity" name="quantity" value="1" min="1"
+                                                       class="quantity-selector">
+                                            </div>
+                                            <button type="submit" name="add" id="AddToCart" class="btn">
+                                                <span id="AddToCartText">Add to Cart</span>
+                                            </button>
+                                        </form>
+                                        {#销售属性结束#}
+                                        {#<div class="product-description rte" itemprop="description">#}
+                                        {#<div class="table-wrapper">#}
+                                        {#<div class="table-wrapper">#}
+                                        {#<table class="data-table" id="product-attribute-specs-table">#}
+                                        {#<tbody>#}
+                                        {#<tr class="first odd">#}
+                                        {#<th class="label">Manufacturer Sku</th>#}
+                                        {#<td class="data last">314996 330</td>#}
+                                        {#</tr>#}
+                                        {#<tr class="even">#}
+                                        {#<th class="label">Gender</th>#}
+                                        {#<td class="data last">Mens</td>#}
+                                        {#</tr>#}
+                                        {#<tr class="last odd">#}
+                                        {#<th class="label">Colorway</th>#}
+                                        {#<td class="data last">ELECTROLIME/ELECTROLIME-BLACK</td>#}
+                                        {#</tr>#}
+                                        {#</tbody>#}
+                                        {#</table>#}
+                                        {#</div>#}
+                                        {#</div>#}
+                                        {#</div>#}
+
+                                        <hr class="hr--clear hr--small">
+                                        {#分享组件开始#}
+                                         {% include "share" %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="hr--clear hr--small">
+                        <div class="section-header section-header--medium">
+                            <h2 class="h4">More from this collection</h2>
+                        </div>
+                        <!--同一个类别下的其他的产品推荐开始-->
+                        <div class="grid-uniform grid-link__container">
+                            {% for key,product in product_info.collection_product_list %}
+
+                                <div class="grid__item post-large--one-quarter medium--one-quarter small--one-half">
+                                    <div class="">
+                                        <a href="/collections/{{ product.collection_id }}/products/{{ product.id }}"
+                                           class="grid-link text-center">
+                                            <span class="grid-link__image grid-link__image--product"
+                                                  style="height: 230px;">
+                                              <span class="grid-link__image-centered">
+                                                  <img src="{{ product.spu_img }}" alt="{{ product.product_name }}">
+                                              </span>
+                                            </span>
+                                            <p class="grid-link__title">{{ product.product_name }}</p>
+                                            <p class="grid-link__meta">
+                                                <span class="visually-hidden">Regular price</span>
+                                            </p>
+                                        </a>
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+                        <!--同一个类别中其他推荐的结束-->
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </main>
+    {% autoescape false %}
+        <script type="text/javascript">
+            var sku = {{ product_sku_info.skus | json_encode }} ;
+            $(function () {
+                function get_option_list() {
+                    var option_list = [];
+                    $(".single-option-selector").each(function (i, html) {
+                        var option = $(html).val();
+                        option_list.push(option);
+                    });
+                    return option_list;
+                }
+                function init() {
+                    var option_list = get_option_list();
+                    var option_id = option_list.join("_");
+                    var current_sku = sku[option_id];
+                    var price = current_sku["sellPrice"];
+                    var skuCode = current_sku["skuCode"];
+                    $(".product-single__price").text(price);
+                    $("#spuCode").val(skuCode);
+                }
+                init();
+                $(".single-option-selector").change(function () {
+                    var option_list = get_option_list();
+                    var option_id = option_list.join("_");
+                    var current_sku = sku[option_id];
+                    var price = current_sku["sellPrice"];
+                    var skuCode = current_sku["skuCode"];
+                    var quantity = $(".quantity-selector").val();
+                    var total_price = price * quantity;
+                    $(".product-single__price").text(total_price.toFixed(2));
+                    $("#spuCode").val(skuCode);
+                });
+                $(".quantity-selector").change(function () {
+                    var option_list = get_option_list();
+                    var quantity = $(this).val();
+                    var option_id = option_list.join("_");
+                    var current_sku = sku[option_id];
+                    var price = current_sku["sellPrice"];
+                    var skuCode = current_sku["skuCode"];
+                    var total_price = price * quantity;
+                    $(".product-single__price").text(total_price.toFixed(2));
+                    $("#spuCode").val(skuCode);
+                });
+            });
+        </script>
+    {% endautoescape %}
+{% endblock %}

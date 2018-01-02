@@ -1,0 +1,54 @@
+{% extends 'theme.twig' %}
+{% block body_class %}template-customers-register{% endblock %}
+{% block body %}
+    <main class="wrapper main-content" role="main">
+        <div class="grid">
+            <div class="grid__item">
+                <div class="grid">
+
+                    <div class="grid__item wide--one-third large--one-half small--text-center">
+
+                        <div class="section-header section-header--large">
+
+                            <h1 class="section-header__title">Create Account</h1>
+                        </div>
+                        <form method="post" action="/account/register" id="create_customer" accept-charset="UTF-8">
+                            <input type="hidden" name="utf8" value="✓">
+                            {{ csrf_field() }}
+                            {%  if session_has("errors")%}
+                                <div class="errors">
+                                        {{ session_get("errors") }}
+                                </div>
+                            {% endif %}
+
+                            <label for="FirstName" class="label--hidden">First Name</label>
+                            <input type="text" name="customer[first_name]" id="FirstName" placeholder="First Name" autocapitalize="words" autofocus="">
+
+                            <label for="LastName" class="label--hidden">Last Name</label>
+                            <input type="text" name="customer[last_name]" id="LastName" placeholder="Last Name" autocapitalize="words">
+
+                            <label for="Email" class="label--hidden">Email</label>
+                            <input type="email" name="customer[email]" id="Email" placeholder="Email" autocorrect="off" autocapitalize="off" >
+
+                            <label for="CreatePassword" class="label--hidden">Password</label>
+                            <input type="password" name="customer[password]" id="CreatePassword" placeholder="Password">
+
+                            <p>
+                                <input type="submit" value="Create" class="btn">
+                            </p>
+                            <a href="/">Return to Store</a>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+{% endblock %}
+
+
+
+
+

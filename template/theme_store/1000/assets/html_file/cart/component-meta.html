@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!-- saved from url=(0092)https://www.paypal.com/webapps/hermes/component-meta?env=production&version=min&xcomponent=1 -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!--[if IE 8]><style>.ng-hide {display: none !important;}</style><![endif]--><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>
+        
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta name="robots" content="noindex">
+
+        <title>PayPal</title>
+    </head>
+
+    <body>
+
+        <script src="./checkout.min.js.下载" data-paypal-checkout="" data-no-bridge="" data-state="ppxo_meta" data-env="production"></script>
+
+        <script nonce="">
+            (function() {
+
+                window.prefetch = true;
+
+                function noop() {}
+
+                window.addContent = noop;
+                window.addMetadata = noop;
+                window.beacon = noop;
+
+                function cookiesEnabled() {
+                    var cookiesEnabled;
+                    document.cookie = '_cookiecheck=1';
+                    cookiesEnabled = Boolean(document.cookie.indexOf('_cookiecheck') > -1);
+                    document.cookie = '_cookiecheck; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                    document.cookie = '_cookiecheck=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                    return cookiesEnabled;
+                }
+
+                var data = {};
+
+                window.preload = function(method, url, res, name) {
+                    data[name] = res;
+                };
+
+                function getLightboxEligibility() {
+
+                    if (false) {
+                        return {
+                            eligible: false,
+                            reason: 'disabled_by_config'
+                        };
+                    }
+
+                    if (!cookiesEnabled()) {
+                        return {
+                            eligible: false,
+                            reason: 'third_party_cookies_disabled'
+                        };
+                    }
+
+                    if (data.auth.data.guest) {
+                        return {
+                            eligible: false,
+                            reason: 'guest'
+                        };
+                    }
+
+                    if (data.auth.data.logged_in || data.auth.data.remembered || data.auth.data.refresh_token) {
+                        return {
+                            eligible: true,
+                            reason: 'one_touch_authed'
+                        };
+                    }
+
+                    return {
+                        eligible: false,
+                        reason: 'one_touch_unauthed'
+                    };
+                }
+
+                window.preloadComplete = function() {
+
+                    var eligibility = getLightboxEligibility();
+
+                    ppxo.postRobot.sendToParent('meta', {
+                        locale: data.locale.data,
+                        iframeEligible: eligibility.eligible,
+                        iframeEligibleReason: eligibility.reason,
+                        rememberedFunding: data.buttonTypes.data.remembered
+                    });
+                };
+            })();
+        </script>
+
+        <script src="./framework.js.下载"></script>
+        <script src="./config.js.下载"></script>
+        <script src="./main.js.下载"></script>
+        <script src="./pa.js.下载"></script>
+    
+
+
+<script nonce="">
+window.preload("get", "/webapps/hermes/api/auth", {
+    "ack": "success",
+    "data": {
+        "logged_in": false,
+        "guest": false,
+        "remembered": false,
+        "password_less": false,
+        "auth_state": "ANONYMOUS",
+        "refresh_token": false,
+        "access_token_present": false,
+        "is_auth_api_call": true,
+        "buyer_id": "",
+        "buyer_ipcountry": "CN",
+        "idTokenPresent": false,
+        "upsellOptInDisplayed": false,
+        "ryiOptIn": {
+            "termsDisplayed": false
+        },
+        "ota": false,
+        "remembered_device_token": false,
+        "remembered_partner_assertion": false
+    },
+    "meta": {
+        "calc": "cb51249f133df",
+        "rlog": "AX6%2FqFvGgVFwA%2FxTNeJJom1WakCZYBhbQUJlvK4T53ONl%2BV8KvGKWCEOX8XmnQHxquLNgXHJvgMcSODdC0mPGQ_16059636417"
+    },
+    "server": "W56haonQQvNwQRzsoW8biaM2QtzbxkH4NI0gTzTlYEGWTdq9l6TEUtqbmHz-eUm78-XqpTmqvWXaTc-JvCUT88aNrmcRA_l76s4DE5BROY7qL8RREkvcu4utJ4_JPOXgHhgQz4IWKUV2U4bkmUv8Ac0SXiCeExrAwGBXZuGGzLQe-KUWHL22X8s6Ehg0h8YGs-eMNAXJiP96AjE0B2ubiCuxETe9WQlqaY60P1BVVxf9fwz9QkFXjW"
+}, "auth");
+</script>
+
+<script nonce="">
+window.preload("get", "/webapps/hermes/api/locale?ipCountry=CN", {
+    "ack": "success",
+    "data": {
+        "country": "CN",
+        "lang": "zh"
+    },
+    "meta": {
+        "calc": "cb51249f133df",
+        "rlog": "AX6%2FqFvGgVFwA%2FxTNeJJom1WakCZYBhbQUJlvK4T53ONl%2BV8KvGKWCEOX8XmnQHxquLNgXHJvgMcSODdC0mPGQ_16059636417"
+    },
+    "server": "_qJAkRYVDo5w6hhBrXOWurCuCawmxTVkKYm1ByXlvROOlQhdt7i6-i-Z7BXTE1iYTl7P4bXHnCw4Hm62NVCtKBfsKsa6YUFiV-irRsLh0S4240eqOtz52knqigkwB5btWeuXiAxkyGz6HgFdqI4Iw-Uc3e1I5Dr10MDp7Q1p_3XkJ3UZTEmsqw3mlXbqFKp4g4cS8jVNfTBagz0XPBAI9ASsZoLfi2IhABvGsEn447fkOb5DB69ZYW"
+}, "locale");
+</script>
+
+<script nonce="">
+window.preload("get", "/webapps/hermes/api/button/funding?country=CN", {
+    "ack": "success",
+    "data": {
+        "remembered": [],
+        "eligible": []
+    },
+    "meta": {
+        "calc": "cb51249f133df",
+        "rlog": "AX6%2FqFvGgVFwA%2FxTNeJJom1WakCZYBhbQUJlvK4T53ONl%2BV8KvGKWCEOX8XmnQHxquLNgXHJvgMcSODdC0mPGQ_16059636417"
+    },
+    "server": "bVz2Sbubf25_B8ernGoLyeHo4UZCxt0i1ATd-8i-kW4ccfCKouTNG0XuxS1_7KelvV0cBHtXYaAAnlyDGJYq9nIH85xoOKF0NnX3MW4XmdMs23FS9Fr3vOvFucrx4m7pEbU_s2W44O0s7hQNkzJ9tSH8aU5axcJZC6OmLKlWYZa4ol4QbyF5RAHFqT6FGi92PxGjCjKtooOP8IXJOPtkTEXrpzqpfOCqWQErbhjnfBP85zKoNeA0BbjjLLM1khHS"
+}, "buttonTypes");
+</script>
+
+<script nonce="">
+window.preloadComplete();
+</script>
+</body></html>

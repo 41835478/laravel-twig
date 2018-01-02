@@ -1,0 +1,434 @@
+{% extends 'carts.twig' %}
+{% block body %}
+
+    <div class="main" role="main">
+        {# 导航开始#}
+        <div class="main__header">
+            <a href="/" class="logo logo--left">
+                <h1 class="logo__text">buckydrop </h1>
+            </a>
+            <ul class="breadcrumb ">
+                <li class="breadcrumb__item breadcrumb__item--completed">
+                    <a class="breadcrumb__link" href="/cart">Cart</a>
+                    <svg class="icon-svg icon-svg--size-10 breadcrumb__chevron-icon rtl-flip" role="img"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                        <path d="M2 1l1-1 4 4 1 1-1 1-4 4-1-1 4-4"></path>
+                    </svg>
+                </li>
+                <li class="breadcrumb__item breadcrumb__item--current">
+                    <span class="breadcrumb__text" aria-current="step">Customer information</span>
+                    <svg class="icon-svg icon-svg--size-10 breadcrumb__chevron-icon rtl-flip" role="img"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                        <path d="M2 1l1-1 4 4 1 1-1 1-4 4-1-1 4-4"></path>
+                    </svg>
+                </li>
+                <li class="breadcrumb__item breadcrumb__item--blank">
+                    <span class="breadcrumb__text">Shipping method</span>
+                    <svg class="icon-svg icon-svg--size-10 breadcrumb__chevron-icon rtl-flip" role="img"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                        <path d="M2 1l1-1 4 4 1 1-1 1-4 4-1-1 4-4"></path>
+                    </svg>
+                </li>
+                <li class="breadcrumb__item breadcrumb__item--blank">
+                    <span class="breadcrumb__text">Payment method</span>
+                </li>
+            </ul>
+            <div data-alternative-payments="">
+            </div>
+        </div>
+        {#导航结束#}
+        {#选择收货地址开始#}
+        <script type="text/javascript">
+            var CustomerAddress = {
+                toggleFormSelectCountry: function (id) {
+                    var country_id = $('#AddressCountry_' + id).val();
+                    $.get("/api/v1/geo/state", {country_id: country_id},
+                        function (data) {
+                            var result = data.data;
+                            if (result.has_state == true) {
+                                var p = result.data;
+                                $("#AddressProvinceContainer_" + id).show();
+                                $("#AddressProvince_" + id).html("");
+                                $.each(p, function (k, v) {
+                                    $("#AddressProvince_" + id).append("<option value='" + k + "'>" + v + "</option>");
+                                })
+                            } else {
+                                $("#AddressProvince_" + id).hide();
+                            }
+                        });
+                }
+            };
+
+            $(function () {
+                var show_add_id = $("#checkout_shipping_address_id").val();
+                $("#show_" + show_add_id).show().siblings().hide();
+                $("#checkout_shipping_address_id").change(function () {
+                    var val = $(this).val();
+                    $("#show_" + val).show().siblings().hide();
+                });
+
+            });
+        </script>
+        <div class="main__content">
+            <div class="step" data-step="contact_information">
+                <form novalidate="novalidate" class="edit_checkout animate-floating-labels"
+                      data-customer-information-form="true" data-email-or-phone="false"
+                      action="/checkout?step=shipping_method" accept-charset="UTF-8" method="post">
+                    <input name="utf8" type="hidden" value="✓">
+                    {#导航用户信息开始#}
+                    <div class="step__sections">
+                        {{ csrf_field() }}
+                        <div class="section section--contact-information">
+                            <div class="section__header">
+                                <div class="layout-flex layout-flex--tight-vertical layout-flex--loose-horizontal layout-flex--wrap">
+                                    <h2 class="section__title layout-flex__item layout-flex__item--stretch">Customer
+                                        information</h2>
+                                </div>
+                            </div>
+
+                            <div class="section__content" data-section="customer-information"
+                                 data-shopify-pay-validate-on-load="false">
+                                <div class="logged-in-customer-information">
+                                    <div class="logged-in-customer-information__avatar-wrapper">
+                                        <div class="logged-in-customer-information__avatar gravatar"
+                                             style="background-image: url(//proxy.shopifycdn.com/8a40810b91491893839de2007f8cb32f5b4bfa26c0669abdbe207fe64f44811a/www.gravatar.com/avatar/ba5be9d0e05d233483ce06fc066be363.jpg?s=100&amp;d=https%3A%2F%2Fcdn.shopify.com%2Fs%2Fassets%2Fno-gravatar-new-04e7c2331218ac202e79e31be502fd5631bc96cb0206580dbcb0720ebbbd7c73_100x100.png);filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=&#39;//proxy.shopifycdn.com/8a40810b91491893839de2007f8cb32f5b4bfa26c0669abdbe207fe64f44811a/www.gravatar.com/avatar/ba5be9d0e05d233483ce06fc066be363.jpg?s=100&amp;d=https%3A%2F%2Fcdn.shopify.com%2Fs%2Fassets%2Fno-gravatar-new-04e7c2331218ac202e79e31be502fd5631bc96cb0206580dbcb0720ebbbd7c73_100x100.png&#39;, sizingMethod=&#39;scale&#39;)"
+                                             role="img" aria-label="Avatar"></div>
+                                    </div>
+                                    {% if session_has("users") %}
+                                        {% set user = session_get("users") %}
+                                        <p class="logged-in-customer-information__paragraph">
+                                            <span class="page-main__emphasis">{{ user.first_name }} {{ user.last_name }}</span>
+                                            <span data-rtl-ensure="">({{ user.email }})</span>
+                                            <br>
+                                            <a href="/account/logout?return_url=/checkout?step=contact_information">Log
+                                                out</a>
+                                        </p>
+                                    {% endif %}
+
+                                </div>
+                                <div class="logged-in-customer-newsletter" data-buyer-accepts-marketing="">
+                                    <div class="checkbox-wrapper">
+                                        <div class="checkbox__input">
+                                            <input name="checkout[buyer_accepts_marketing]" type="hidden" value="0">
+                                            <input class="input-checkbox" data-backup="buyer_accepts_marketing"
+                                                   type="checkbox" value="1" checked="checked"
+                                                   name="checkout[buyer_accepts_marketing]"
+                                                   id="checkout_buyer_accepts_marketing">
+                                        </div>
+                                        <label class="checkbox__label" for="checkout_buyer_accepts_marketing">
+                                            Keep me up to date on news and exclusive offers
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section section--shipping-address" data-shipping-address=""
+                             data-update-order-summary="">
+                            <div class="section__header">
+                                <h2 class="section__title">
+                                    Shipping address
+                                </h2>
+                            </div>
+
+                            <div class="section__content">
+                                <div class="fieldset" data-address-fields="">
+
+                                    <div class="field field--required field--show-floating-label">
+                                        <div class="field__input-wrapper field__input-wrapper--select">
+                                            <label class="field__label field__label--visible"
+                                                   for="checkout_shipping_address_id">Stored addresses</label>
+                                            <select data-address-selector="" data-field-name-format="address"
+                                                    data-backup="contact_stored_addresses"
+                                                    class="field__input field__input--select" aria-required="true"
+                                                    name="address[id]" id="checkout_shipping_address_id">
+                                                {#<option value="">New address…</option>#}
+                                                {% for address in address_list %}
+                                                <option value="{{ address.id }}">{{ address.address1 }}  {{ address.city }}
+                                                    , {{ address.zip_code }} {{ address.province_name }} {{ address.country_name }}
+                                                    {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div id="show_content">
+                                        {% for key,address in address_list %}
+                                            <div id="show_{{ address.id }}" style="display: none">
+                                                <div class="field field--required field--show-floating-label field--half"
+                                                     data-address-field="first_name">
+                                                    <div class="field__input-wrapper">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_first_name">First
+                                                            name</label>
+                                                        <input placeholder="First name"
+                                                               autocomplete="shipping given-name"
+                                                               data-backup="first_name" class="field__input"
+                                                               aria-required="true" size="30" type="text"
+                                                               name="address[first_name]"
+                                                               id="checkout_shipping_address_first_name"
+                                                               value="{{ address.first_name }}">
+                                                    </div>
+                                                </div>
+                                                <div class="field field--required field--show-floating-label field--half"
+                                                     data-address-field="last_name">
+                                                    <div class="field__input-wrapper">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_last_name">Last
+                                                            name</label>
+                                                        <input placeholder="Last name"
+                                                               autocomplete="shipping family-name"
+                                                               data-backup="last_name" class="field__input"
+                                                               aria-required="true" size="30" type="text"
+                                                               name="address[last_name]"
+                                                               id="checkout_shipping_address_last_name"
+                                                               value="{{ address.last_name }}">
+                                                    </div>
+                                                </div>
+
+                                                <div data-address-field="company" class="field field--optional">
+                                                    <div class="field__input-wrapper">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_company">Company
+                                                            (optional)
+                                                        </label>
+                                                        <input placeholder="Company (optional)"
+                                                               autocomplete="shipping organization"
+                                                               data-backup="company" class="field__input" size="30"
+                                                               type="text" name="address[company]"
+                                                               id="checkout_shipping_address_company"
+                                                               value="{{ address.company }}">
+                                                    </div>
+                                                </div>
+                                                <div class="field field--required field--show-floating-label field--two-thirds"
+                                                     data-address-field="address1" data-google-places="true">
+                                                    <div class="field__input-wrapper">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_address1">Address</label>
+                                                        <input placeholder="Address"
+                                                               autocomplete="shipping address-line1" autocorrect="off"
+                                                               data-backup="address1" data-google-autocomplete="true"
+                                                               data-google-autocomplete-title="Suggestions"
+                                                               class="field__input" aria-required="true" size="30"
+                                                               type="text" name="address[address1]"
+                                                               id="checkout_shipping_address_address1"
+                                                               value="{{ address.address1 }}">
+                                                    </div>
+                                                </div>
+                                                <div class="field field--optional field--show-floating-label field--third"
+                                                     data-address-field="address2" data-google-places="true">
+                                                    <div class="field__input-wrapper">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_address2">Apt, suite, etc.
+                                                            (optional)
+                                                        </label>
+                                                        <input placeholder="Apt, suite, etc. (optional)"
+                                                               autocomplete="shipping address-line2" autocorrect="off"
+                                                               data-backup="address2" class="field__input" size="30"
+                                                               type="text" name="address[address2]"
+                                                               id="checkout_shipping_address_address2"
+                                                               value="{{ address.address2 }}">
+                                                    </div>
+                                                </div>
+                                                <div data-address-field="city" data-google-places="true"
+                                                     class="field field--required field--show-floating-label">
+                                                    <div class="field__input-wrapper">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_city">City</label>
+                                                        <input placeholder="City" autocomplete="shipping address-level2"
+                                                               autocorrect="off" data-backup="city" class="field__input"
+                                                               aria-required="true" size="30" type="text"
+                                                               name="address[city]" id="checkout_shipping_address_city"
+                                                               value="{{ address.city }}">
+                                                    </div>
+                                                </div>
+                                                <div class="field field--required field--show-floating-label field--three-eights"
+                                                     data-address-field="country" data-google-places="true"
+                                                     onchange="CustomerAddress.toggleFormSelectCountry({{ address.id }}); return false">
+                                                    <div class="field__input-wrapper field__input-wrapper--select">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_country">Country</label>
+                                                        <select size="1" autocomplete="shipping country"
+                                                                data-backup="country"
+                                                                class="field__input field__input--select"
+                                                                aria-required="true" name="address[country]"
+                                                                id="AddressCountry_{{ address.id }}">
+                                                            {% for id,country in country_list %}
+                                                                <option {% if country == address.country_name %} selected='selected' {% endif %}
+                                                                        value="{{ id }}"> {{ country }} </option>
+                                                            {% endfor %}
+                                                        </select>
+
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="field field--required field--show-floating-label field--three-eights"
+                                                     data-address-field="province" data-google-places="true" id="AddressProvinceContainer_{{ address.id }}" >
+                                                    <div class="field__input-wrapper field__input-wrapper--select">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_province">Province</label>
+                                                        <select placeholder="Province"
+                                                                autocomplete="shipping address-level1"
+                                                                data-backup="province"
+                                                                class="field__input field__input--select"
+                                                                aria-required="true" name="address[province]"
+                                                                id="AddressProvince_{{ address.id }}">
+                                                            {% for id,province in address.province_list %}
+                                                                <option value="{{ id }}" {% if province == address.province_name %} selected='selected' {% endif %}> {{- province }}</option>
+                                                            {% endfor %}
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="field field--required field--show-floating-label field--quarter"
+                                                     data-address-field="zip" data-google-places="true">
+                                                    <div class="field__input-wrapper">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_zip">Postal code</label>
+                                                        <input placeholder="Postal code"
+                                                               autocomplete="shipping postal-code" data-backup="zip"
+                                                               data-google-autocomplete="true"
+                                                               data-google-autocomplete-title="Suggestions"
+                                                               class="field__input field__input--zip"
+                                                               aria-required="true" size="30" type="text"
+                                                               name="address[zip]" id="checkout_shipping_address_zip"
+                                                               value="{{ address.zip_code }}">
+                                                    </div>
+                                                </div>
+                                                <div data-address-field="phone"
+                                                     class="field field--optional field--show-floating-label">
+                                                    <div class="field__input-wrapper">
+                                                        <label class="field__label field__label--visible"
+                                                               for="checkout_shipping_address_phone">Phone
+                                                            (optional)</label>
+                                                        <input placeholder="Phone (optional)"
+                                                               autocomplete="shipping tel" data-backup="phone"
+                                                               data-phone-formatter="true"
+                                                               class="field__input field__input--numeric" size="30"
+                                                               type="tel" name="address[phone]"
+                                                               id="checkout_shipping_address_phone"
+                                                               data-phone-formatter-country-code="86"
+                                                               value="{{ address.phone_number }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        {#导航用户信息结束#}
+
+                        <div class="step__footer" data-step-footer="">
+                            <button name="button" type="submit" class="step__footer__continue-btn btn ">
+                                <span class="btn__content">Continue to shipping method</span>
+                                <i class="btn__spinner icon icon--button-spinner"></i>
+                            </button>
+                            <a class="step__footer__previous-link" href="/carts">
+                                <svg class="icon-svg icon-svg--color-accent icon-svg--size-10 previous-link__icon rtl-flip"
+                                     role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+                                    <path d="M8 1L7 0 3 4 2 5l1 1 4 4 1-1-4-4"></path>
+                                </svg>
+                                <span class="step__footer__previous-link-content">Return to cart</span></a>
+                        </div>
+                </form>
+            </div>
+        </div>
+
+        {#结束收货地址选择结束#}
+
+        <div class="main__footer">
+            <div class="modals">
+                <div class="modal-backdrop" role="dialog" id="policy-32330828" aria-labelledby="policy-32330828-title"
+                     data-modal-backdrop="">
+                    <div class="modal">
+                        <div class="modal__header">
+                            <h1 class="modal__header__title" id="policy-32330828-title">
+                                Refund policy
+                            </h1>
+                            <div class="modal__close">
+                                <button type="button" class="icon icon--close-modal" data-modal-close="">
+                                            <span class="visually-hidden">
+                                            Close
+                                            </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal__content">
+                            <svg class="modal__loading-icon icon icon--spinner" width="32" height="32"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M32 16c0 8.837-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0v2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14h2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-backdrop" role="dialog" id="policy-32330892" aria-labelledby="policy-32330892-title"
+                     data-modal-backdrop="">
+                    <div class="modal">
+                        <div class="modal__header">
+                            <h1 class="modal__header__title" id="policy-32330892-title">
+                                Privacy policy
+                            </h1>
+                            <div class="modal__close">
+                                <button type="button" class="icon icon--close-modal" data-modal-close="">
+                                            <span class="visually-hidden">
+Close
+</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal__content">
+                            <svg class="modal__loading-icon icon icon--spinner" width="32" height="32"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M32 16c0 8.837-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0v2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14h2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-backdrop" role="dialog" id="policy-32330956" aria-labelledby="policy-32330956-title"
+                     data-modal-backdrop="">
+                    <div class="modal">
+                        <div class="modal__header">
+                            <h1 class="modal__header__title" id="policy-32330956-title">
+                                Terms of service
+                            </h1>
+                            <div class="modal__close">
+                                <button type="button" class="icon icon--close-modal" data-modal-close="">
+                                            <span class="visually-hidden">
+Close
+</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal__content">
+                            <svg class="modal__loading-icon icon icon--spinner" width="32" height="32"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M32 16c0 8.837-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0v2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14h2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div role="contentinfo" aria-label="Footer">
+                <ul class="policy-list">
+                    {#<li class="policy-list__item">#}
+                    {#<a title="Refund policy" data-modal="policy-32330828" data-close-text="Close" href="/15928069/policies/32330828.html">Refund policy</a>#}
+                    {#</li>#}
+                    {#<li class="policy-list__item">#}
+                    {#<a title="Privacy policy" data-modal="policy-32330892" data-close-text="Close" href="/15928069/policies/32330892.html">Privacy policy</a>#}
+                    {#</li>#}
+                    {#<li class="policy-list__item">#}
+                    {#<a title="Terms of service" data-modal="policy-32330956" data-close-text="Close" href="/15928069/policies/32330956.html">Terms of service</a>#}
+                    {#</li>#}
+                </ul>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+{% endblock %}
