@@ -40,11 +40,10 @@ class TwigAddGlobal
         $setting_data_file = $current_theme_dir."/config/settings_data.json";
         $setting_dat = file_get_contents($setting_data_file);
         $content = json_decode($setting_dat,true);
-
         $request["setting"] = $content;
         Twig::addGlobal("settings",$content["current"]);
         Twig::addGlobal("sections",$content["current"]["sections"]);
-
+            
         Twig::addGlobal("assets",$request["assets"]);
         Twig::addGlobal("host","http://".$theme_host);
 
