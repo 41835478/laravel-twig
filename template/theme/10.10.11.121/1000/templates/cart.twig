@@ -73,7 +73,7 @@
                                         <div class="grid--full cart__row--table-large">
                                             <div class="grid__item one-third">
                                                 <span class="cart__mini-labels">Price</span>
-                                                <span class="h5">¥{{ product["price"] }}</span>
+                                                <span class="h5">{{ product["price"] | price_format(currency_format) }}</span>
                                             </div>
 
                                             <div class="grid__item one-third text-center">
@@ -85,7 +85,7 @@
                                             <div class="grid__item one-third text-right">
                                                 <span class="cart__mini-labels">Total</span>
                                                      <span class="h5">
-                                                            {{ product["total_price"] }}
+                                                           {{ product["total_price"] | price_format(currency_format) }}
                                                  </span>
                                              </div>
                                         </div>
@@ -99,7 +99,7 @@
                                     <div class="grid__item text-right">
                                         <p>
                                             <span class="cart__subtotal-title">Subtotal</span>
-                                            <span class="h5 cart__subtotal"> ¥{{ total_price }}</span>
+                                            <span class="h5 cart__subtotal"> {{ total_price | price_format(currency_format) }} </span>
                                         </p>
                                         <p><em>Shipping, taxes, and discounts will be calculated at checkout.</em></p>
                                         <a class="btn--secondary" href="/collections/all">Continue
@@ -107,11 +107,7 @@
 
                                         <button type="submit" name="checkout" id="checkout" class="btn">Check Out</button>
                                         <div class="cart__additional_checkout">
-                                            <button name="goto_pp" type="submit" id="paypal-express-button"
-                                                    class="additional-checkout-button additional-checkout-button--paypal-express"
-                                                    value="paypal_express" data-strategy="cart">
-                                                <img alt="Checkout with: PayPal" src="{{ assets }}/assets/img/paypal.png">
-                                            </button>
+
                                         </div>
                                     </div>
                                 </div>

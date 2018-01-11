@@ -31,6 +31,11 @@ Route::group([], function() {
     Route::post('/account/addresses/{id}', "AddressController@update")->name('account_address_update');
     Route::delete("/account/addresses/{id}","AddressController@destroy")->name("account_address_delete");
 
+    //c端订单相关处理
+
+    Route::get('/account/orders', "OrdersController@index")->name('account_orders_index');
+
+
     // 购物车相关
 
     Route::get('/carts', "CartsController@index")->name('cart_index');
@@ -50,8 +55,8 @@ Route::group([], function() {
     //留言相关
     Route::post('/contact', "ContactsController@store")->name('contact_store');
 
-    Route::get('/checkout', "CheckoutController@index")->name('checkout_get');
-    Route::post('/checkout', "CheckoutController@index")->name('checkout_post');
+    Route::get('/checkouts/{sign}', "CheckoutController@index")->name('checkout_get');
+    Route::post('/checkouts/{sign}', "CheckoutController@index")->name('checkout_post');
 
 
     Route::group(['prefix' => 'admin'], function() {

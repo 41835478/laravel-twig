@@ -13,13 +13,22 @@ use PayPal\Api\RedirectUrls;
 use PayPal\Api\Transaction;
 use App\Http\Helper\PayPalHelper;
 use PayPal\Api\PaymentExecution;
+use Illuminate\Support\Facades\Session;
+use App\Http\Models\Carts;
+use App\Http\Models\Orders;
+use App\Http\Models\PaypalTransactionLogs;
+use App\Http\Helper\Helper;
+use App\Http\Models\OrdersProductItems;
+use DB;
 
 
 use Illuminate\Http\Request;
 
 class PayPalController extends Controller
 {
-    function create()
+    public $papal_transaction_log = null;
+
+    function create(Request $request)
     {
         $apiContext = PayPalHelper::getApiContext();
         $payer = new Payer();
@@ -27,30 +36,42 @@ class PayPalController extends Controller
         // ### Itemized information
         // (Optional) Lets you specify item wise
         // information
-        $item1 = new Item();
-        $item1->setName('Ground Coffee 40 oz')
-            ->setCurrency('USD')
-            ->setQuantity(1)
-            ->setSku("123123")// Similar to `item_number` in Classic API
-            ->setPrice(7.5);
-        $item2 = new Item();
-        $item2->setName('Granola bars')
-            ->setCurrency('USD')
-            ->setQuantity(5)
-            ->setSku("321321")// Similar to `item_number` in Classic API
-            ->setPrice(2);
+        $carts = Session::get("checkouts");
+        $check_sign = md5(json_encode($carts) . config("app.key"));
+        $sign = $request->input("sign");
+        if ($check_sign != $sign) {
+            return response()->json(["status" => false, "errors" => "sign errors"]);
+        }
+        $business_id = $this->getBusinessId();
 
+        list($result, $total_price_cny) = Carts::FormatProduct($carts, $business_id);
+        $exchange_rate = 0.1538;
+        list($result, $goods_total_price_usd) = Helper::CartsUSDFormat($result, $exchange_rate);
         $itemList = new ItemList();
-        $itemList->setItems(array($item1, $item2));
+
+        foreach ($result as $key => $value) {
+            $item1 = new Item();
+            $item1->setName($value["productName"])
+                ->setCurrency('USD')
+                ->setQuantity($value["quantity"])
+                ->setSku($value["id"])// product_id与skuCode Similar to `item_number` in Classic API
+                ->setPrice($value["price_usd"]);
+            $itemList->addItem($item1);
+        }
 
         // ### Additional payment details
         // Use this optional field to set additional
         // payment information such as tax, shipping
         // charges etc.
+        $tax = round($goods_total_price_usd * 0.029 + 0.3, 2);
+        $shipping_method = Session::get("select_shipping_method");
+
+        $shipping_method_charge = isset($shipping_method["totalChargeUSD"]) ? $shipping_method["totalChargeUSD"] : 0;
+        $total_price = $tax + $goods_total_price_usd + $shipping_method_charge;
         $details = new Details();
-        $details->setShipping(1.2)
-            ->setTax(1.3)
-            ->setSubtotal(17.50);
+        $details->setShipping($shipping_method_charge)
+            ->setTax($tax)
+            ->setSubtotal($goods_total_price_usd);
 
         // ### Amount
         // Lets you specify a payment amount.
@@ -58,7 +79,7 @@ class PayPalController extends Controller
         // such as shipping, tax.
         $amount = new Amount();
         $amount->setCurrency("USD")
-            ->setTotal(20)
+            ->setTotal($total_price)
             ->setDetails($details);
 
         // ### Payee
@@ -81,12 +102,10 @@ class PayPalController extends Controller
         // ### Redirect urls
         // Set the urls that the buyer must be redirected to after
         // payment approval/ cancellation.
-        $baseUrl = "http://10.10.11.121";
+        $baseUrl = $request->getSchemeAndHttpHost();
         $redirectUrls = new RedirectUrls();
-
-        $redirectUrls->setReturnUrl("$baseUrl/paypal/execute-payment?success=true")
-            ->setCancelUrl("$baseUrl/paypal/execute-payment?success=false");
-
+        $redirectUrls->setReturnUrl("$baseUrl/paypal/execute-payment")
+            ->setCancelUrl("$baseUrl/paypal/execute-payment?success=0");
         // ### Payment
         // A Payment Resource; create one using
         // the above types and intent set to 'sale'
@@ -95,82 +114,164 @@ class PayPalController extends Controller
             ->setPayer($payer)
             ->setRedirectUrls($redirectUrls)
             ->setTransactions(array($transaction));
-
-        // For Sample Purposes Only.
-        $request = clone $payment;
-
         $payment->create($apiContext);
+        //创建订单信息
+        $users = $request->session()->get("users");
+        $member_id = $users["member_id"];
+        $shipping_address = Session::get("shipping_address");
 
-        return response()->json($payment->toArray());
+        try {
+
+            $rand_member_id = strlen($member_id) > 5 ? substr($member_id, -5) : sprintf("%05d", $member_id);
+            $order_id = date("ymdHis") . $rand_member_id . rand(10, 99);
+            $total_price_cny = $total_price_cny;
+            $total_price_usd = $goods_total_price_usd;
+            $delivery_method = "直发";
+            $sending_route = 1;
+            //物流id选择
+            $shipping_methods_id = $shipping_method["productId"];
+            $shipping_methods_name = $shipping_method["productEnName"];
+            $shipping_methods_price_cny = $shipping_method["totalChargeUSD"];
+            $account_address_id = $shipping_address["id"];
+            $date_time = date("Y-m-d H:i:s");
+            DB::beginTransaction();
+            try {
+                $data = [
+                    "order_id" => $order_id,
+                    "business_id" => $business_id,
+                    "member_id" => $member_id,
+                    "total_price_cny" => $total_price_cny,
+                    "total_price_usd" => $total_price_usd,
+                    "remarks" => "",
+                    "delivery_method" => $delivery_method,
+                    "sending_route" => $sending_route,
+                    "shipping_methods_id" => $shipping_methods_id,
+                    "shipping_methods_name" => $shipping_methods_name,
+                    "shipping_methods_price_cny" => $shipping_methods_price_cny,
+                    "account_address_id" => $account_address_id,
+                    "status" => 0,
+                    "status_msg" => "",
+                    "created_at" => $date_time,
+                    "updated_at" => $date_time
+                ];
+                Orders::insert($data);
+
+                $payment_id = $payment->id;
+                $hash = md5($payment_id);
+                $transaction_data = [
+                    "order_id" => $order_id,
+                    "payment_id" => $payment_id,
+                    "hash" => $hash,
+                    "status" => 0
+                ];
+                PaypalTransactionLogs::insert($transaction_data);
+                //获取创建订单
+                $transaction = $payment->getTransactions();
+
+                $transactions_result = $transaction[0]->item_list->items;
+                $product_items = [];
+                if (is_array($transactions_result)) {
+                    foreach ($transactions_result as $key => $value) {
+                        $id = $value->sku;
+                        $product_info = $result[$id];
+                        $items["order_id"] = $order_id;
+                        $items["business_id"] = $business_id;
+                        $items["product_id"] = $product_info["product_id"];
+                        $items["spuCode"] = $product_info["spu_code"];
+                        $items["skuCode"] = $product_info["sku_code"];
+                        $items["platform"] = $product_info["platform"];
+                        $items["price_cny"] = $product_info["price"];  //淘宝价格
+                        $items["price_usd"] = $value->price;         //售出的美元价格
+                        $items["quantity"] = $value->quantity;
+                        $product_items[] = $items;
+                    }
+                }
+                OrdersProductItems::insert($product_items);
+            } catch (\Exception $e) {
+                DB::rollBack();
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            return response()->json(["status" => false, "errors" => "Failed to create order Please try again later"]);
+        }
+        return response()->json(["status"=>true,"data"=>$payment->toArray()]);
     }
-
 
     function executePayment(Request $request)
     {
-        $success = $request->input("success");
+        // 检查这笔订单是否支付过
+
         $paymentId = $request->input("paymentID");
         $payer_id = $request->input("payerID");
 
-        $apiContext = PayPalHelper::getApiContext();
+        $success = $request->input("success");
+        if($success === 0){
+            return response()->json(["status" => false, "errors" => "The order has been canceled"]);
+        }
+        $business_id = $this->getBusinessId();
 
-        // Get the payment Object by passing paymentId
-        // payment id was previously stored in session in
-        // CreatePaymentUsingPayPal.php
+        $this->papal_transaction_log = PaypalTransactionLogs::where("payment_id", $paymentId)->first();
+        if (empty($this->papal_transaction_log)) {
+            return response()->json(["status" => false, "errors" => "paymentId is errors"]);
+        }
+        if ($this->papal_transaction_log->status == 1) {
+            return response()->json(["status" => false, "errors" => "This order has been paid successfully"]);
+        }
+
+        $apiContext = PayPalHelper::getApiContext();
         $paymentId = $paymentId;
         $payment = Payment::get($paymentId, $apiContext);
-
-        // ### Payment Execute
-        // PaymentExecution object includes information necessary
-        // to execute a PayPal account payment.
-        // The payer_id is added to the request query parameters
-        // when the user is redirected from paypal back to your site
+        if ($payment->getState() == "approved") {
+            $this->updateOrder($business_id, $paymentId);
+            return response()->json(["status" => true, "errors" => "payment successful"]);
+        }
         $execution = new PaymentExecution();
         $execution->setPayerId($payer_id);
-
-        // ### Optional Changes to Amount
-        // If you wish to update the amount that you wish to charge the customer,
-        // based on the shipping address or any other reason, you could
-        // do that by passing the transaction object with just `amount` field in it.
-        // Here is the example on how we changed the shipping to $1 more than before.
-        $transaction = new Transaction();
-        $amount = new Amount();
-        $details = new Details();
-
-        $details->setShipping(2.2)
-            ->setTax(1.3)
-            ->setSubtotal(17.50);
-
-        $amount->setCurrency('USD');
-        $amount->setTotal(21);
-        $amount->setDetails($details);
-        $transaction->setAmount($amount);
-
-        // Add the above transaction object inside our Execution object.
-        $execution->addTransaction($transaction);
-
         try {
             // Execute the payment
-            // (See bootstrap.php for more on `ApiContext`)
-            $result = $payment->execute($execution, $apiContext);
-
-            // NOTE: PLEASE DO NOT USE RESULTPRINTER CLASS IN YOUR ORIGINAL CODE. FOR SAMPLE ONLY
-
+            $payment->execute($execution, $apiContext);
             try {
                 $payment = Payment::get($paymentId, $apiContext);
             } catch (Exception $ex) {
-                // NOTE: PLEASE DO NOT USE RESULTPRINTER CLASS IN YOUR ORIGINAL CODE. FOR SAMPLE ONLY
-                var_dump($ex->getMessage());
-                die;
-                exit(1);
+                return response()->json(["status" => false, "errors" => "Payment failed"]);
             }
         } catch (Exception $ex) {
-            // NOTE: PLEASE DO NOT USE RESULTPRINTER CLASS IN YOUR ORIGINAL CODE. FOR SAMPLE ONLY
-            var_dump($ex->getMessage());
-            die;
-            exit(1);
+            return response()->json(["status" => false, "errors" => "Payment failed"]);
         }
-        return response()->json($payment->toArray());
 
+        if ($payment->getState() == 'approved') {
+            try {
+                $this->updateOrder($business_id, $paymentId);
+                return response()->json(["status" => true, "errors" => "payment successful"]);
+            } catch (\Exception $e) {
+                return response()->json(["status" => false, "errors" => "update status failed"]);
+            }
+        } else {
+            return response()->json(["status" => false, "errors" => "Payment failed"]);
+        }
+
+        return response()->json(["status" => true, "errors" => "payment successful"]);
     }
+
+    function updateOrder($business_id, $paymentId)
+    {
+        DB::beginTransaction();
+        try {
+            $this->papal_transaction_log->status = 1;
+            $this->papal_transaction_log->save();
+            $order = Orders::where("order_id", $this->papal_transaction_log->order_id)->where("business_id", $business_id)->first();
+            $order->third_serial_number = $paymentId;
+            $order->status = 1;
+            $order->updated_at = date("Y-m-d H:i:s");
+            //更新表
+            $order->save();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return false;
+        }
+        DB::commit();
+        return true;
+    }
+
 
 }

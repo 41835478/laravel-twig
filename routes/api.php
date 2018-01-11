@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +15,8 @@ use Illuminate\Http\Request;
 */
 Route::group(["prefix" => "v1"], function () {
     Route::get('/readme', 'ReadmeController@index');
+    Route::get("/test", "Admin\TestController@index");
+
     Route::get('/buckydrop', 'ReadmeController@buckydrop');
 
     Route::middleware('auth:api')->get('/user', function (Request $request) {
@@ -73,6 +76,30 @@ Route::group(["prefix" => "v1"], function () {
         Route::resource('pages', 'Admin\PagesController', ['only' => ['index', 'store', 'show']]);
         Route::post("/pages/action", "Admin\PagesController@action");
         Route::post("/pages/{id}", "Admin\PagesController@update");
+
+        //导航相关
+        Route::get("/navigation/index", "Admin\NavigationController@index");
+        Route::get("/menus/link_list", "Admin\MenusController@linkList");
+        Route::resource('menus', 'Admin\MenusController', ['only' => ['index', 'store', 'show']]);
+        Route::post("menus/action", "Admin\MenusController@actions");
+        Route::post("menus/{id}", "Admin\MenusController@update");
+
+        //运费设置相关
+        Route::get("/freights/get_rate_quote", "Admin\BusinessFreightsController@getRateQuote");
+        Route::get("/freights/get_country_list", "Admin\BusinessFreightsController@getCountryList");
+
+        Route::get("/freights/index","Admin\BusinessFreightsController@index");
+        Route::post("/freights","Admin\BusinessFreightsController@store");
+        Route::get("/freights/{country_id}","Admin\BusinessFreightsController@show");
+        Route::post("/freights/action", "Admin\BusinessFreightsController@action");
+
+        //一般设置相关
+        Route::get("/settings/get_currency_list", "Admin\SettingsController@getCurrency");
+        Route::get("/settings/show", "Admin\SettingsController@show");
+        Route::post("/settings/update", "Admin\SettingsController@update");
+
+
+
 
     });
 });

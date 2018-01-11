@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use DB;
+use App\Http\Models\Countrys ;
 
 class GeoController extends Controller
 {
 
     public function country(){
-        $list = DB::table("country")->get()->pluck("name","id");
+        $list = Countrys::getList();
         return response()->json(["status" => true, 'data' => $list]);
     }
 
@@ -28,13 +29,6 @@ class GeoController extends Controller
         return response()->json(["status" => true, 'data' => $data]);
     }
 
-    public function city(Request $request){
-        $state_id = $request->input("state_id","");
-        if (empty($state_id)){
-            return response()->json(["status" => false,"errors"=>"state_id is empty"]);
-        }
-        $list = DB::table("city")->where("state_id",$state_id)->get()->pluck("name","id");
-        return response()->json(["status" => true, 'data' => $list]);
-    }
+
 
 }

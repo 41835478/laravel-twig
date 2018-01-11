@@ -7,6 +7,8 @@ use App\Http\Models\BusinessAccounts;
 use Illuminate\Support\Facades\Session;
 use App\Http\Models\AccountsAddress;
 use App\Http\Models\Carts;
+use App\Http\Models\Orders;
+
 
 class AccountsController extends Controller
 {
@@ -78,6 +80,7 @@ class AccountsController extends Controller
 
     public function login(Request $request)
     {
+        $request->getContent();
         $method = $request->getMethod();
         if ($method == "GET") {
             return view("login");
@@ -128,7 +131,11 @@ class AccountsController extends Controller
         $address = AccountsAddress::where("account_id",$account_id)->where("default",1)->first();
         $count = AccountsAddress::where("account_id",$account_id)->count();
         $address["count"] = $count;
-        return view("account",["address"=>$address]);
+        $business_id = $this->getBusinessId();
+        //用户的订单数据 创建未支付的 24小时重新标记订单过期 把过期数据重新放入购物车中 （）
+        $count = Orders::where("business_id",$business_id)->where("member_id",$account_id)->count();
+        $orders["count"] = $count;
+        return view("account",["address"=>$address,"orders"=>$orders]);
     }
 
     public function logout(Request $request)

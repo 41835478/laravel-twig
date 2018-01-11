@@ -22,7 +22,7 @@ class ProductsController extends Controller
         $free_shipment = $request->input("free_shipment", ""); // 1 免国内运费
         $start_price = $request->input("start_price", "");
         $end_price = $request->input("end_price", "");
-        $platform = $request->input("platform",2); // 1:淘宝;2:天 猫;3京东；10:淘宝联盟
+        $platform = $request->input("platform", 2); // 1:淘宝;2:天 猫;3京东；10:淘宝联盟
         $lang_type = $request->input("lang_type", "");
 
         if (empty($keywords)) {
@@ -156,9 +156,9 @@ class ProductsController extends Controller
             $data["update_time"] = isset($result["updateTime"]) ? date("Y-m-d H:i:s", substr($result["updateTime"], 0, 10)) : date("Y-m-d H:i:s");
             $data["created_at"] = date("Y-m-d H:i:s");
             $data["updated_at"] = date("Y-m-d H:i:s");
-            $skus = isset($result["skus"])?$result["skus"]:"";
-            if(!empty($skus)){
-                $data["price"] = isset($skus[0])?$skus[0]["sellPrice"]/100:0;
+            $skus = isset($result["skus"]) ? $result["skus"] : "";
+            if (!empty($skus)) {
+                $data["price"] = isset($skus[0]) ? $skus[0]["sellPrice"] / 100 : 0;
             }
             $product_id = Products::insertGetId($data);
             $result["product_id"] = $product_id;
@@ -194,7 +194,7 @@ class ProductsController extends Controller
             } elseif ($type == 3) {
                 Products::where("business_id", $business_id)->whereIn("id", $product_id_list)->delete();
                 //删除在所有的分类信息
-                CollectionProducts::whereIn("product_id",$product_id_list)->delete();
+                CollectionProducts::whereIn("product_id", $product_id_list)->delete();
                 $msg = "successfully deleted";
             }
         } catch (\Exception $e) {
@@ -202,6 +202,32 @@ class ProductsController extends Controller
         }
         return response()->json(["status" => true, "msg" => $msg]);
     }
+
+
+    public function show(Request $request,$product_id)
+    {
+        $business_id = $request->business_info->id;
+        $result = MongoProducts::where("business_id",$business_id)->where("product_id",$product_id)->first();
+        return response()->json(["status" => true,"data"=>$result]);
+    }
+
+    public function update(Request $request)
+    {
+        $content = $request->getContent();
+        $business_id = $request->business_info->id;
+        $content = json_decode($content,true);
+        $product_id = $content["product_id"];
+        try{
+            MongoProducts::where("business_id",$business_id)->where("product_id",$product_id)->update($content);
+        }catch (\Exception $e){
+            $msg = "Update failed";
+            return response()->json(["status" => false, "msg" => $msg]);
+        }
+        $msg = "update completed";
+
+        return response()->json(["status" => true, "msg" => $msg]);
+    }
+
 
 
 }

@@ -60,7 +60,7 @@
                                             <div class="product-single__prices">
                                                 <span id="PriceA11y" class="visually-hidden">Regular price</span>
                                                 <span id="ProductPrice" class="product-single__price" itemprop="price"
-                                                      content="350.0">
+                                                      content="{{ currency_format }}">
                                                 </span>
                                             </div>
                                         {#销售属性开始#}
@@ -78,7 +78,8 @@
                                             </div>
                                             {{ csrf_field() }}
                                             <input type="hidden" name="product_id" value="{{ product_info.id }}">
-                                            <input type="hidden" name="spuCode" id="spuCode" value="">
+                                            <input type="hidden" name="spuCode" value="{{  product_info.spu_code}}">
+                                            <input type="hidden" name="skuCode" id="skuCode" value="">
 
                                             <div class="product-single__quantity">
                                                 <label for="Quantity">Quantity</label>
@@ -89,29 +90,6 @@
                                                 <span id="AddToCartText">Add to Cart</span>
                                             </button>
                                         </form>
-                                        {#销售属性结束#}
-                                        {#<div class="product-description rte" itemprop="description">#}
-                                        {#<div class="table-wrapper">#}
-                                        {#<div class="table-wrapper">#}
-                                        {#<table class="data-table" id="product-attribute-specs-table">#}
-                                        {#<tbody>#}
-                                        {#<tr class="first odd">#}
-                                        {#<th class="label">Manufacturer Sku</th>#}
-                                        {#<td class="data last">314996 330</td>#}
-                                        {#</tr>#}
-                                        {#<tr class="even">#}
-                                        {#<th class="label">Gender</th>#}
-                                        {#<td class="data last">Mens</td>#}
-                                        {#</tr>#}
-                                        {#<tr class="last odd">#}
-                                        {#<th class="label">Colorway</th>#}
-                                        {#<td class="data last">ELECTROLIME/ELECTROLIME-BLACK</td>#}
-                                        {#</tr>#}
-                                        {#</tbody>#}
-                                        {#</table>#}
-                                        {#</div>#}
-                                        {#</div>#}
-                                        {#</div>#}
 
                                         <hr class="hr--clear hr--small">
                                         {#分享组件开始#}
@@ -160,31 +138,36 @@
     {% autoescape false %}
         <script type="text/javascript">
             var sku = {{ product_sku_info.skus | json_encode }} ;
+            function get_option_list() {
+                var option_list = [];
+                $(".single-option-selector").each(function (i, html) {
+                    var option = $(html).val();
+                    option_list.push(option);
+                });
+                return option_list;
+            }
+            function format_price(price) {
+                var format = $("#ProductPrice").attr("content");
+                var re = /(\{\{*?amount*?\}\})/ ;
+                format =format.replace(re,price);
+                return format;
+            }
+
+            function init() {
+                var option_list = get_option_list();
+                var option_id = option_list.join("_");
+                if (sku[option_id]){
+                    var current_sku = sku[option_id];
+                    var price = current_sku["sellPrice"];
+                    var skuCode = current_sku["skuCode"];
+                    var current_price = format_price(price);
+                    $(".product-single__price").text(current_price);
+                    $("#skuCode").val(skuCode);
+                }else{
+                    $(".product-single__price").text("Not enough stock");
+                }
+            }
             $(function () {
-                function get_option_list() {
-                    var option_list = [];
-                    $(".single-option-selector").each(function (i, html) {
-                        var option = $(html).val();
-                        option_list.push(option);
-                    });
-                    return option_list;
-                }
-                function init() {
-                    var option_list = get_option_list();
-
-                    var option_id = option_list.join("_");
-                    console.log(option_id);
-                    if (sku[option_id]){
-                        var current_sku = sku[option_id];
-                        var price = current_sku["sellPrice"];
-                        var skuCode = current_sku["skuCode"];
-                        $(".product-single__price").text("¥"+price);
-                        $("#spuCode").val(skuCode);
-                    }else{
-                        $(".product-single__price").text("Not enough stock");
-                    }
-                }
-
                 init();
                 $(".single-option-selector").change(function () {
                     var option_list = get_option_list();
@@ -195,8 +178,9 @@
                         var skuCode = current_sku["skuCode"];
                         var quantity = $(".quantity-selector").val();
                         var total_price = price * quantity;
-                        $(".product-single__price").text("¥"+total_price.toFixed(2));
-                        $("#spuCode").val(skuCode);
+                        var current_price = format_price(total_price.toFixed(2));
+                        $(".product-single__price").text(current_price);
+                        $("#skuCode").val(skuCode);
                     }else{
                         $(".product-single__price").text("Not enough stock");
                     }
@@ -211,8 +195,9 @@
                         var price = current_sku["sellPrice"];
                         var skuCode = current_sku["skuCode"];
                         var total_price = price * quantity;
-                        $(".product-single__price").text("¥"+total_price.toFixed(2));
-                        $("#spuCode").val(skuCode);
+                        var current_price = format_price(total_price.toFixed(2));
+                        $(".product-single__price").text(current_price);
+                        $("#skuCode").val(skuCode);
                     }else {
                         $(".product-single__price").text("Not enough stock");
                     }

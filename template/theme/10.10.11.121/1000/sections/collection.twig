@@ -28,7 +28,7 @@
                         <p class="grid-link__meta">
                             {#<span class="visually-hidden">Regular price</span>#}
                             {#$550.00#}
-                            From {{ product.price}}
+                            From {{ product.price | price_format(currency_format) }}
                         </p>
                     </a>
                 </div>

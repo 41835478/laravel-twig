@@ -71,8 +71,9 @@ class SuperBuyOpenApi
 
     }
 
-    public static  function getRateQuote($query_params){
-        $http_url = "http://testapi.oa.com/logistics/routes/rate-quote";
+    public  function getRateQuote($query_params){
+        $access_token = $this->getAccessToken();
+        $http_url = "http://opentest.superbuy.com/rest/v1/logistics/routes/rate-quote?access_token=$access_token";
         $header = array('Content-Type: application/json');
         $protocol  =strpos($http_url,"https") == false ? "http":"https";
         $content = Network::makeRequest($http_url, json_encode($query_params), 20,"post",$protocol,$header);

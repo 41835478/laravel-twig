@@ -209,7 +209,12 @@ return [
         |
         */
         'filters' => [
-            'get' => 'data_get',    
+            'get' => 'data_get',
+            'price_format' =>function ($string,$format) {
+                $format = str_replace("{{amount}}",$string,$format);
+//                $format = str_replace(" ","",$format);
+                return $format;
+            }
         ],
     ],  
 ];

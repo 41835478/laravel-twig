@@ -9,7 +9,7 @@
     *   [1.6 设置商户地址信息](#1.6)
     *   [1.7 获取国家列表接口](#1.7)
     *   [1.8 根据国家获取所有的州或者省](#1.8)
-    *   [1.9 根据国家州获取城市数据](#1.9)
+
             
 *  商品相关
     *   [2.1 商品搜索接口](#2.1)
@@ -42,21 +42,49 @@
     *   [6.3 获取单个分类的信息](#6.3)
     *   [6.4 分类更新接口](#6.4)
     *   [6.5 批量管理分类接口](#6.5)    
-
-* blog文章管理        
+* blog文章管理
+        
     *   [7.1 创建博客接口](#7.1)
     *   [7.2 分页获取博客列表](#7.2)
     *   [7.3 获取单个博客的信息](#7.3)
     *   [7.4 博客更新接口](#7.4)
-    *   [7.5 批量管理博客接口](#7.5)        
+    *   [7.5 批量管理博客接口](#7.5)
+            
+* 店铺货币设置与收款邮箱设置
+   
+    *   [8.1 获取支持的货币列表](#8.1)
+    *   [8.2 获取店铺设置中货币相关](#8.2)
+    *   [8.3 更新店铺设置中货币相关](#8.3)
         
+* 店铺运费模板相关
 
+     *   [9.1 获取物流服务商列表](#9.1)
+     *   [9.2 批量新增或者更新运费](#9.2)
+     *   [9.3 按国家获取设置的运费方式](#9.3)
+     *   [9.4 获取单个国家设置的运费方式](#9.4)
+     *   [9.5 删除某些国家设置的运费](#9.5)
+
+* 后台导航相关接口
+      * [10.1 获取导航列表相关接口](#10.1)
+      * [10.2 获取导航中菜单列表](#10.2)
+      * [10.3 获取菜单添加中类型列表](#10.3)       
+      * [10.4 新增菜单项](#10.4)
+      * [10.5 获取单个菜单详情](#10.5)
+      * [10.6 更新单个菜单详情](#10.6)
+      * [10.7 菜单批量操作](#10.7)
+            
+            
+            
+             
+                         
+    
+           
 ## buckydrop 接口说明
 
 ### 接口使用说明
 * buckydrop 接口地址 
   ```
-  http://10.10.11.121:801  //测试地址
+  http://10.10.11.128  //测试地址
   ```
 * 签名认证说明
 * 凡POST PUT 方法接口都要计算sign签名 5uFT8SvHU4I2YHBzwMHnkhJH0y6fMP0fCqy2lhQRyI840&*(Pz8UbPxmeLsRHr
@@ -377,29 +405,6 @@ authorization Bearer $api_token
 | data.data  |  根据返回的状态值 州列表或者 城市列表
 
 
-<h3 id="1.9">1.9 根据国家州获取城市数据 </h3>
-
-* 接口地址 /api/v1/geo/city
-* 请求方法 GET 
-### 参数说明
-| 参数      |    类型 |  说明 | 是否必须  |
-| :-------- | --------:|--------: |:--: |
-| state_id  | int |  州id |是   
-
-
-
-* 接口返回
-
-```
-{
-    "status": true,
-    "data": {
-        "3374": "Birmingham",
-        "3375": "Mobile",
-        "3376": "Montgomery"
-    }
-}
-```
 
 
 
@@ -1452,5 +1457,667 @@ authorization Bearer $api_token
  {
      "status": true,
      "msg": "Shelves success"
+ }
+```
+
+<h3 id="8.1">8.1 获取支持的货币列表</h3>
+
+* 接口地址 /api/v1/settings/get_currency_list
+* 请求方法 GET
+* 需要认证头
+
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": [
+        {
+            "area_id": 3,
+            "area_en_name": "USA",
+            "currency": "USD",
+            "currency_format": "$ {{amount}} USD"
+        },
+        {
+            "area_id": 79,
+            "area_en_name": "China",
+            "currency": "CNY",
+            "currency_format": "¥ {{amount}} CNY"
+        },
+        {
+            "area_id": 24999,
+            "area_en_name": "Canada",
+            "currency": "CAD",
+            "currency_format": "$ {{amount}} CAD"
+        }
+    ]
+}
+```
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| area_id | 所在地区id
+| area_en_name  | 所在地区的英文名称
+| currency  | 货币简称
+| currency_format  | 默认的货币展示格式 {{amount}}表示占位符合 会替换成实际的货币数值  
+
+
+<h3 id="8.2">8.2 获取店铺设置中货币相关</h3>
+
+* 接口地址 /api/v1/settings/get_currency_list
+* 请求方法 GET
+* 需要认证头
+
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": {
+        "area_id": 3,
+        "currency": "USD",
+        "currency_format": "$ {{amount}} USD",
+        "paypal_email": ""
+    }
+}
+```
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| area_id | 所在地区id
+| currency  | 货币简称
+| currency_format  | 默认的货币展示格式 {{amount}}表示占位符合 会替换成实际的货币数值
+| paypal_email  | 商户类型的paypal email 收款账号
+
+
+  
+<h3 id="8.3">8.3 更新店铺设置中货币相关</h3>
+
+* 接口地址 /api/v1/settings/update
+* 请求方法 POST
+* 需要认证头
+* 接口请求头 application/json
+
+* 请求参数说明
+
+| 参数      |    类型 | 说明  |  是否必须  |
+| :-------- | --------:| :--: |:--: |
+| area_id | int | 所在地区id | 否 
+| area_en_name  |string| 所在地区的英文名称 | 否
+| currency  | string| 货币简称 |  否 （设置店铺货币以上同时不能为空）
+| currency_format  | string | 默认的货币展示格式 {{amount}}表示占位符合 会替换成实际的货币数值 | 否 （设置收款邮箱此项不能为空）  
+
+请求body
+```
+{
+	"area_id":3,
+	"currency":"USD",
+	"currency_format":"$ {{amount}} USD",
+	"paypal_email":"729357-facilitator@qq.com"
+}
+
+```
+
+* 接口返回 
+
+`
+```
+{
+    "status": true,
+    "data": {
+        "area_id": 3,
+        "currency": "USD",
+        "currency_format": "$ {{amount}} USD",
+        "paypal_email": "729357-facilitator@qq.com"
+    },
+    "msg": "Saved successfully"
+}
+```
+
+<h3 id="9.1">9.1 获取物流服务商列表</h3>
+
+* 接口地址 /api/v1/freights/get_rate_quote
+* 请求方法 GET
+* 需要认证头
+
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": [
+        {
+            "product_id": 107,
+            "product_name": "DHL",
+            "basic_weight": 500,
+            "basic_freight_rate": 11400,
+            "additional_weight": 500,
+            "additional_freight_rate": 3700,
+            "currency": "CNY"
+        },
+        {
+            "product_id": 108,
+            "product_name": "EMS",
+            "basic_weight": 500,
+            "basic_freight_rate": 11600,
+            "additional_weight": 500,
+            "additional_freight_rate": 4000,
+            "currency": "CNY"
+        },
+   ]
+}        
+```
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| product_id | 选择的物流线路id
+| product_name  | 线路名称
+| basic_weight  | 首重 单位 g
+| basic_freight_rate  | 首重费用 单位分
+| additional_weight  | 续重 单位 g
+| additional_freight_rate  | 续重费用 单位分
+| currency  | 货币单位
+
+
+
+
+<h3 id="9.2">9.2 批量新增或者更新运费</h3>
+
+* 接口地址 /api/v1/freights
+* 请求方法 POST
+* 需要认证头
+* 接口请求头 application/json
+
+* 请求参数说明
+
+| 参数      |    类型 | 说明  |  是否必须  |
+| :-------- | --------:| :--: |:--: |
+| country_list | [] | 选择的国家id列表 | 是 
+| shipping.product_id  | [] | 物流线路id | 是
+| shipping.product_name  | []| 物流线路名称 |  是 
+| shipping.basic_weight  | [] | 首重参数 | 非免邮必须
+| shipping.basic_freight_rate  | [] | 首重费用 | 非免邮必须
+| shipping.additional_weight  | [] | 续重 | 非免邮必须
+| shipping.additional_weight_rate  | [] | 续重费用 | 非免邮必须
+| free  | int | 免邮 | 免邮必须
+  
+
+请求body
+```
+{
+	"country_list":[12],
+	"shipping":{
+		"product_id":[107,108],
+		"product_name":["DHL","EMS"],
+		"basic_weight":[600,600],
+		"basic_freight_rate":[600,600],
+		"additional_weight":[600,600],
+		"additional_weight_rate":[600,600]
+	},
+	"free":1
+}
+
+```
+
+* 接口返回 
+
+`
+```
+{
+    "status": true,
+    "msg": "Added successfully"
+}
+```
+
+<h3 id="9.3">9.3 按国家获取设置的运费方式</h3>
+
+* 接口地址 /api/v1/freights/index
+* 请求方法 GET
+* 需要认证头
+
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": [
+        {
+            "country_name": "USA",
+            "country_id": 3,
+            "name_list": [
+                "DHL",
+                "EMS"
+            ]
+        },
+        {
+            "country_name": "USA",
+            "country_id": 24999,
+            "name_list": [
+                "DHL",
+                "EMS"
+            ]
+        }
+    ]
+}       
+```
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| country_id | 国家id
+| country_name | 国家名称
+| name_list | 已经选择的物流线路名称列表
+
+
+
+<h3 id="9.4">9.4 获取单个国家设置的运费方式</h3>
+
+* 接口地址 /api/v1/freights/{country_id}
+* 请求方法 GET
+* 需要认证头
+* {country_id} 表示占占位符号 
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": [
+        {
+            "country_id": 3,
+            "country_name": "USA",
+            "product_id": 107,
+            "product_name": "DHL",
+            "basic_weight": 600,
+            "basic_freight_rate": "600.00",
+            "additional_weight": 600,
+            "additional_weight_rate": "600.00"
+        },
+        {
+            "country_id": 3,
+            "country_name": "USA",
+            "product_id": 108,
+            "product_name": "EMS",
+            "basic_weight": 600,
+            "basic_freight_rate": "600.00",
+            "additional_weight": 600,
+            "additional_weight_rate": "600.00"
+        }
+    ]
+}   
+```
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| product_id   | 物流线路id |
+| product_name  | 物流线路名称 |  
+| basic_weight  | 首重参数 |
+| basic_freight_rate  | 首重费用 | 
+| additional_weight  | 续重 | 
+| additional_weight_rate  | 续重费用 | 
+
+
+
+<h3 id="9.5">9.5 删除某些国家设置的运费</h3>
+
+* 接口地址 /api/v1/freights/action
+* 请求方法 POST
+* 需要认证头
+* 接口请求头 application/json
+
+* 请求参数说明
+
+| 参数      |    类型 | 说明  |  是否必须  |
+| :-------- | --------:| :--: |:--: |
+| country_id_list  | 数组 |  需要操作的国家id列表  |是 
+| type  | smallint |  3 删除（删除有风险） | 是
+
+请求body
+```
+{
+	"type":3,
+	"country_id_list":[3]
+}
+
+```
+
+* 接口返回 
+
+`
+```
+ {
+     "status": true,
+     "msg": "successfully deleted" // msg 返回 在接口规则中有说明
+ }
+```
+
+
+<h3 id="10.1">10.1 获取导航列表相关接口</h3>
+
+* 接口地址 /api/v1/navigation/index
+* 请求方法 GET
+* 需要认证头
+
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": [
+        {
+            "navigation_id": 1,
+            "navigation_title": "主菜单",
+            "handle": "main-menu",
+            "menu_list": [
+                "关于我们",
+                "联系我们"
+            ]
+        },
+        {
+            "navigation_id": 2,
+            "navigation_title": "底部菜单",
+            "handle": "footer",
+            "menu_list": []
+        }
+    ]
+}      
+```
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| navigation_id | 导航列表id
+| navigation_title | 导航标题
+| handle | 前端模板取值标志
+| menu_list | 此栏目包含的菜单文字列表
+
+
+
+<h3 id="10.2">10.2 获取导航中菜单列表</h3>
+
+* 接口地址 /api/v1/menus/index
+* 请求方法 GET
+* 需要认证头
+
+
+* 请求参数说明
+
+| 参数      |    类型 | 说明  |  是否必须  |
+| :-------- | --------:| :--: |:--: |
+| navigation_id  | int |  获取的导航id  |是 
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": {
+        "navigation_id": 1,
+        "navigation_title": "主菜单",
+        "handle": "main-menu",
+        "menu_list": [
+            {
+                "id": 2,
+                "title": "关于我们",
+                "menu_type": "page",
+                "subject_id": 1,
+                "position": 1,
+                "parent_menu_id": 0
+            },
+            {
+                "id": 3,
+                "title": "联系我们",
+                "menu_type": "page",
+                "subject_id": 2,
+                "position": 2,
+                "parent_menu_id": 0
+            }
+        ]
+    }
+}    
+```
+
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| navigation_id | 导航列表id
+| navigation_title | 导航标题
+| handle | 前端模板取值标志
+| menu_list.id | 菜单id
+| menu_list.title | 菜单标题
+| menu_list.menu_type | 菜单类型  home（首页） search（搜索） collection（集合） product（产品）page（单页）blog（博客）
+| menu_list.subject_id | home与search 为空 其余表示相应类型的id （集合表示 集合相应的id product 表示相应的产品id page表示相应的单页id blog表示相应的博文分类id）  
+
+<h3 id="10.3">10.3 获取菜单添加中类型列表</h3>
+
+* 接口地址 /api/v1/menus/link_list
+* 请求方法 GET
+* 需要认证头
+
+
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": [
+        {
+            "title": "home",
+            "menu_type": "home",
+            "subclass": false
+        },
+        {
+            "title": "search",
+            "menu_type": "search",
+            "subclass": false
+        },
+        {
+            "title": "collection",
+            "menu_type": "collection",
+            "subclass": true,
+            "menu_list": {
+                "collection_id": -1,
+                "title": "ALL Collections"
+            }
+        },
+        {
+            "title": "product",
+            "menu_type": "product",
+            "subclass": true,
+            "menu_list": {
+                "product_id": -1,
+                "product_name": "All Product"
+            }
+        },
+        {
+            "title": "page",
+            "menu_type": "page",
+            "subclass": true
+        },
+        {
+            "title": "blog",
+            "menu_type": "blog",
+            "subclass": true
+        }
+    ]
+}    
+```
+
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| title | 类型显示名称
+| menu_type | 菜单类型  home（首页） search（搜索） collection（集合） product（产品）page（单页） blog（博客）
+| subclass | 是否含有子类   （collection与product 需要获得的数据 与上面的 menu_list合并）
+
+
+<h3 id="10.4">10.4  新增菜单项</h3>
+
+* 接口地址 /api/v1/menus
+* 请求方法 POST
+* 需要认证头
+
+
+* 请求参数说明
+
+| 参数      |    类型 | 说明  |  是否必须  |
+| :-------- | --------:| :--: |:--: |
+| title  | string |  菜单名称  | 是
+| navigation_id  | int |  所属的导航id  | 是
+| menu_type  | string |  home（首页） search（搜索） collection（集合） product（产品）page（单页） blog（博客分类）  | 是
+| subject_id  | int |  目标id（home search 目标id为空 其他的传相应类型的id） | 否
+| parent_menu_id  | int |  所属的父类id（0表示父分类） | 否
+| position | int |  利于客户端的排序用 可以传适当的值 | 否
+
+
+请求demo
+
+```
+{
+	"title":"最新产品",
+	"navigation_id":1,
+	"menu_type":"collection",
+	"subject_id":82,  // 82是集合的id
+	"position":3,
+	"parent_menu_id":0    
+}
+
+```
+
+
+
+* 接口返回 
+
+```
+{
+    "status": true,
+    "data": {
+        "menu_id": 4
+    }
+}
+```
+
+
+<h3 id="10.5">10.5 获取单个菜单详情</h3>
+
+* 接口地址 /api/v1/menus/{id}
+* 请求方法 GET
+* 需要认证头
+* {id} 表示占位符 表示需要请求的集合id 
+
+
+* 接口返回
+
+```
+{
+    "status": true,
+    "data": {
+        "menu_id": 4,
+        "title": "最新产品",
+        "menu_type": "collection",
+        "subject_id": 82,
+        "position": 3,
+        "parent_menu_id": 0
+    }
+}
+
+```
+
+* 返回参数说明 
+
+| 参数      |    说明
+| :-------- | --------
+| menu_id  | 菜单id
+| title  | 菜单标题
+| menu_type  | 类型
+| subject_id  | 目标id
+| position  | 排序id
+| parent_menu_id  | 父类id
+
+<h3 id="10.6">10.6  更新单个菜单详情</h3>
+
+* 接口地址 /api/v1/menus/{id}
+* 请求方法 POST
+* 需要认证头
+* {id} 占位符号
+
+* 请求参数说明
+
+| 参数      |    类型 | 说明  |  是否必须  |
+| :-------- | --------:| :--: |:--: |
+| title  | string |  菜单名称  | 是
+| navigation_id  | int |  所属的导航id  | 是
+| menu_type  | string |  home（首页） search（搜索） collection（集合） product（产品）page（单页） blog（博客分类）  | 是
+| subject_id  | int |  目标id（home search 目标id为空 其他的传相应类型的id） | 否
+| parent_menu_id  | int |  所属的父类id（0表示父分类） | 否
+| position | int |  利于客户端的排序用 可以传适当的值 | 否
+
+
+请求demo
+
+```
+{
+	"title":"最新产品",
+	"navigation_id":1,
+	"menu_type":"collection",
+	"subject_id":82,  // 82是集合的id
+	"position":3,
+	"parent_menu_id":0    
+}
+```
+
+
+
+* 接口返回 
+
+```
+{
+    "status": true,
+    "msg":"Update the collection is successful"
+}
+```
+
+<h3 id="10.7">10.7 菜单批量操作</h3>
+
+* 接口地址 /api/v1/menus/action
+* 请求方法 POST
+* 需要认证头
+* 接口请求头 application/json
+
+* 请求参数说明
+
+| 参数      |    类型 | 说明  |  是否必须  |
+| :-------- | --------:| :--: |:--: |
+| menu_id_list  | 数组 |  需要操作的国家id列表  |是 
+| type  | smallint |  3 删除（删除有风险） | 是
+
+请求body
+```
+{
+	"type":3,
+	"menu_id_list":[4]
+}
+
+```
+
+* 接口返回 
+
+`
+```
+ {
+     "status": true,
+     "msg": "successfully deleted" // msg 返回 在接口规则中有说明
  }
 ```

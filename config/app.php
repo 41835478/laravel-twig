@@ -181,7 +181,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Barryvdh\Cors\ServiceProvider::class,
         Jenssegers\Mongodb\MongodbServiceProvider::class,
-
+        PragmaRX\Countries\ServiceProvider::class,
     ],
 
     /*
@@ -232,7 +232,10 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Twig' => TwigBridge\Facade\Twig::class,
         'Moloquent'   => Jenssegers\Mongodb\Eloquent\Model::class,
+        'Countries'=> PragmaRX\Countries\Facade::class,
     ],
-    "template_path"=>base_path()."/template"
+    "template_path"=>base_path()."/template",
+    "paypal_client_id"=>"AaM3Zm4S3UZkLd0MjA5R3wIwURiSApB5n_DclwYmigC_RVmZFz3QlMGeoTphY0Fr1CX1L3Lh1pZaGu_5",
+    "paypal_client_secret"=>"ECZTeppO_DEimNqtrheEpvyy3AcVA8uDalrRNBPMfZSCgOpR8wM4HBsbXm-Q77YGvAFwZpZocczdm1qn"
 
 ];

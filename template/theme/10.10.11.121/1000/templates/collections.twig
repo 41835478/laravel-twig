@@ -31,8 +31,7 @@
                                         </span>
                                         <p class="grid-link__title">{{ all_product.product_name }}</p>
                                         <p class="grid-link__meta">
-                                            <span class="visually-hidden">Regular price</span>
-                                            ¥{{ all_product.price }}
+                                            {{ all_product.price | price_format(currency_format) }}
                                         </p>
                                     </a>
                                 </div>
@@ -54,6 +53,16 @@
                                 {#</li>#}
                                 {#<li><a href="/collections/jordan/shoes?page=2" title="Next »">→</a></li>#}
                             {#</ul>#}
+
+                            <ul class="pagination-custom">
+                                {% include 'pagination.twig' with {
+                                    currentFilters: { myFilter: filtervariables },
+                                    currentPage: current_page ,
+                                    paginationPath: path ,
+                                    lastPage:  page_total ,
+                                    showAlwaysFirstAndLast: true
+                                } only %}
+                            </ul>
 
                         </div>
                     </div>

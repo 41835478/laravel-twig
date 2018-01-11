@@ -15,9 +15,10 @@ class Carts extends Model
   public static function FormatProduct($carts,$business_id){
         $result = [];
         $total_price = 0;
+
         if (!empty($carts)) {
             foreach ($carts as $key => $value) {
-                $product_info = MongoProducts::where("business_id", $business_id)->where("product_id", intval($value["product_id"]))->select("productName", "spuImgs", "skus")->first();
+                $product_info = MongoProducts::where("business_id", $business_id)->where("product_id", intval($value["product_id"]))->select("spuCode","platform","productName", "spuImgs", "skus","product_id")->first();
                 $productProps = [];
                 $spu_img = "";
                 $price = 0;
@@ -25,7 +26,7 @@ class Carts extends Model
                     $product_info = $product_info->toArray();
                     $skus = $product_info["skus"];
                     foreach ($skus as $v) {
-                        if ($v["skuCode"] == $value["spuCode"]) {
+                        if ($v["skuCode"] == $value["skuCode"]) {
                             $productProps = $v["productProps"];
                             $spu_img = $v["imgUrl"];
                             $price = $v["sellPrice"];
@@ -39,12 +40,17 @@ class Carts extends Model
                         unset($product_info["spuImgs"]);
                     }
                     $product_info["id"] = $key;
+                    // 数据库中的 skuCode 实际存的是 skuCode 后面需要对于关系
+
+                    $product_info["sku_code"] =  $value["skuCode"];
                     $product_info["productProps"] = $productProps;
                     $product_info["spu_img"] = $spu_img;
                     $product_info["quantity"] = intval($value["quantity"]);
                     $product_info["price"] = sprintf("%.2f", $price / 100);
                     $product_info["total_price"] = sprintf("%.2f", $product_info["quantity"] * $product_info["price"]);
                     $product_info["url"] = Helper::ProductUrlFormat($value["product_id"]);
+                    $product_info["platform"] = $product_info["platform"];
+                    $product_info["spu_code"] = $product_info["spuCode"];
                     $total_price += $product_info["total_price"];
                     $result[$key] = $product_info;
                 }
@@ -69,25 +75,26 @@ class Carts extends Model
                 self::where("account_id",$account_id)->where("business_id",$business_id)->delete();
                 $date_time = date("Y-m-d H:i:s");
                 foreach ($carts as $key=>$value){
-                    $data[]=["account_id"=>$account_id,"business_id"=>$business_id,"product_id"=>$value["product_id"],"spuCode"=>$value["spuCode"],"quantity"=>$value["quantity"],"created_at"=>$date_time,"updated_at"=>$date_time];
+                    $data[]=["account_id"=>$account_id,"business_id"=>$business_id,"product_id"=>$value["product_id"],"skuCode"=>$value["skuCode"],"spuCode"=>$value["spuCode"],"quantity"=>$value["quantity"],"created_at"=>$date_time,"updated_at"=>$date_time];
                 }
             }
             if(!empty($data)){
                 self::insert($data);
             }
         }catch (\Exception $e){
+            var_dump($e->getMessage());die;
             DB::rollBack();
         }
         DB::commit();
         return true;
     }
 
-    public static function updateToCart($account_id,$business_id,$product_id,$spu_code,$action,$quantity=0){
+    public static function updateToCart($account_id,$business_id,$product_id,$sku_code,$action,$quantity=0){
         if($action == "remove"){
-            self::where("account_id",$account_id)->where("business_id",$business_id)->where("product_id",$product_id)->where("spuCode",$spu_code)->delete();
+            self::where("account_id",$account_id)->where("business_id",$business_id)->where("product_id",$product_id)->where("skuCode",$sku_code)->delete();
         }
         elseif ($action == "update_quantity"){
-            self::where("account_id",$account_id)->where("business_id",$business_id)->where("product_id",$product_id)->where("spuCode",$spu_code)->update(["quantity"=>$quantity]);
+            self::where("account_id",$account_id)->where("business_id",$business_id)->where("product_id",$product_id)->where("skuCode",$sku_code)->update(["quantity"=>$quantity]);
         }
         return true;
     }
@@ -97,11 +104,12 @@ class Carts extends Model
         $data = [];
         if(!$result->isEmpty()){
             foreach ($result as $key=>$value){
-                $data[$value->product_id."_".$value->spuCode] = ["product_id"=>$value->product_id,"spuCode"=>$value["spuCode"],"quantity"=>$value["quantity"],"business_id"=>$business_id];
+                $data[$value->product_id."_".$value->skuCode] = ["product_id"=>$value->product_id,"skuCode"=>$value["skuCode"],"spuCode"=>$value["spuCode"],"quantity"=>$value["quantity"],"business_id"=>$business_id];
             }
         }
         return $data;
     }
+
 
 
 

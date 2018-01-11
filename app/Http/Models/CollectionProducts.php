@@ -16,7 +16,10 @@ class CollectionProducts extends Model
         return $product_id_list;
     }
 
-
+    public static function getPageProductsList($collection_id,$offset,$page_size){
+        $product_id_list = self::where("collection_id",$collection_id)->where("up_and_down",1)->offset($offset)->limit($page_size)->get()->pluck("product_id","id");
+        return $product_id_list;
+    }
 
 
 }

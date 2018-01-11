@@ -66,14 +66,13 @@
                     var val = $(this).val();
                     $("#show_" + val).show().siblings().hide();
                 });
-
             });
         </script>
         <div class="main__content">
             <div class="step" data-step="contact_information">
                 <form novalidate="novalidate" class="edit_checkout animate-floating-labels"
                       data-customer-information-form="true" data-email-or-phone="false"
-                      action="/checkout?step=shipping_method" accept-charset="UTF-8" method="post">
+                      action="/checkouts/{{ sign }}?step=shipping_method" accept-charset="UTF-8" method="post">
                     <input name="utf8" type="hidden" value="✓">
                     {#导航用户信息开始#}
                     <div class="step__sections">
@@ -397,8 +396,8 @@ Close
                             <div class="modal__close">
                                 <button type="button" class="icon icon--close-modal" data-modal-close="">
                                             <span class="visually-hidden">
-Close
-</span>
+                                                Close
+                                            </span>
                                 </button>
                             </div>
                         </div>

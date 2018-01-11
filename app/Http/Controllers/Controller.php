@@ -12,11 +12,8 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-
-
     function getCarts(){
         $users = session()->get("users");
-        $carts = [];
         if (empty($users)) {
             // 获取记录的其他的购物车中信息是否有
             $carts = session()->get("carts");
@@ -30,6 +27,12 @@ class Controller extends BaseController
             $carts = $users_carts;
         }
         return $carts;
+    }
+
+    public function getBusinessId(){
+        $business_info = session()->get("business_info");
+        $business_id = $business_info["id"];
+        return $business_id;
     }
 
 

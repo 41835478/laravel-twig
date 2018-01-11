@@ -10,7 +10,16 @@
                 <div class="grid">
                     <div class="grid__item two-thirds medium-down--one-whole">
                         <h2 class="h4">Order History</h2>
-                        <p>You haven't placed any orders yet.</p>
+                        {% if orders.count %}
+                            <p>
+                                <a href="/account/orders">View Orders ({{ orders.count}})</a>
+                            </p>
+                        {% else %}
+                            <p>
+                                You haven't placed any orders yet.
+                            </p>
+                        {% endif %}
+
                     </div>
                     <div class="grid__item one-third medium-down--one-whole">
                         <h2 class="h4">Account Details</h2>

@@ -22,7 +22,6 @@ class CartsController extends Controller
         $business_id = $business_info["id"];
         $member_id = $users["member_id"];
         $carts = $this->getCarts();
-
         list($result,$total_price) = Carts::FormatProduct($carts,$business_id);
         return view("cart", ["cart_list" => $result, "total_price" => $total_price]);
     }
@@ -39,13 +38,13 @@ class CartsController extends Controller
         $carts = $this->getCarts();
 
         $product_id = $request->input("product_id");
-        $spuCode = $request->input("spuCode");
+        $skuCode = $request->input("skuCode");
         $quantity = $request->input("quantity");
-
+        $spuCode =  $request->input("spuCode");
         $business_info = $request->session()->get("business_info");
         $business_id = $business_info["id"];
-        $cart_unique_code = $product_id . "_" . $spuCode;
-        $cart_data = ["product_id" => $product_id, "spuCode" => $spuCode, "quantity" => $quantity, "business_id" => $business_id];
+        $cart_unique_code = $product_id . "_" . $skuCode;
+        $cart_data = ["product_id" => $product_id, "skuCode" => $skuCode, "spuCode"=>$spuCode, "quantity" => $quantity, "business_id" => $business_id];
         $data[$cart_unique_code] = $cart_data;
 
         // 只记录本此加入的 多次的 要合并操作
@@ -140,8 +139,19 @@ class CartsController extends Controller
      */
     function checkout(Request $request)
     {
-        //确认信息
-        return redirect('/checkout?step=contact_information');
+        //确认信息 用户登陆
+        //把cars中的信息 放入checkout中 此后数据只可读并写入一个sign
+        $users = $request->session()->get("users");
+        if(empty($users)){
+            return redirect('/carts');
+        }
+        $carts = $this->getCarts();
+        if(empty($carts) || !is_array($carts)){
+            return redirect('/carts');
+        }
+        Session::put("checkouts", $carts);
+        $sign = md5(json_encode($carts).config("app.key"));
+        return redirect("/checkouts/{$sign}?step=contact_information");
     }
 
 

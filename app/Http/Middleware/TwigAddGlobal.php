@@ -8,6 +8,7 @@ use App\Http\Models\Business;
 use Illuminate\Support\Facades\Session;
 use App\Http\Models\Collections;
 use App\Http\Models\Pages;
+use App\Http\Models\BusinessSettings;
 
 class TwigAddGlobal
 {
@@ -47,6 +48,8 @@ class TwigAddGlobal
         Twig::addGlobal("assets",$request["assets"]);
         Twig::addGlobal("host","http://".$theme_host);
 
+        $currency_format = BusinessSettings::where("business_id",$business_id)->value("currency_format");
+        Twig::addGlobal("currency_format",$currency_format);
         // linklists 导航变量的映射
         $collections = Collections::where("business_id",$business["id"])->where("up_and_down",1)->select("id","title")->get();
         $linklists = [];

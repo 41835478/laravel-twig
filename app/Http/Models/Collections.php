@@ -14,4 +14,14 @@ class Collections extends Model
         }
         return $content;
     }
+
+    public static function getCount($collection){
+        if (is_array($collection)){
+            $count = self::whereIn("id",$collection)->count();
+        }else{
+            $count = self::where("id",$collection)->count();
+        }
+        return $count;
+    }
+
 }

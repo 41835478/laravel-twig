@@ -17,7 +17,6 @@
         </a>
     </div>
 </div>
-
 <div class="content" data-content="">
     <div class="wrap">
         <div class="sidebar" role="complementary">
@@ -63,7 +62,9 @@
                                             </td>
 
                                             <td class="product__price">
-                                                <span class="order-summary__emphasis">{{ product.price }}</span>
+                                                <span class="order-summary__emphasis">
+                                                    {{ product.price | price_format(currency_format) }}
+                                                </span>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -85,22 +86,20 @@
                                     <th class="total-line__name" scope="row">Subtotal</th>
                                     <td class="total-line__price">
                                                 <span class="order-summary__emphasis" data-checkout-subtotal-price-target="266900">
-                                                        ￥{{ total_price }}
-                                                        </span>
+                                                      {{ price.subtotal | price_format(currency_format) }}
+                                                 </span>
                                     </td>
                                 </tr>
                                 <tr class="total-line total-line--shipping">
                                     <th class="total-line__name" scope="row">Shipping</th>
                                     <td class="total-line__price">
-                                                <span class="order-summary__emphasis" data-checkout-total-shipping-target="0">
-                                                    —
-                                                    </span>
-                                    </td>
-                                </tr>
-                                <tr class="total-line total-line--taxes hidden" data-checkout-taxes="">
-                                    <th class="total-line__name" scope="row">Taxes</th>
-                                    <td class="total-line__price">
-                                        <span class="order-summary__emphasis" data-checkout-total-taxes-target="0">$0.00</span>
+                                                <span class="order-summary__emphasis" data-checkout-total-shipping-target="0" id="shipping_rate">
+                                                    {% if price.shipping %}
+                                                        {{ price.shipping | price_format(currency_format) }}
+                                                    {% else %}
+                                                        ---
+                                                    {% endif %}
+                                                  </span>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -110,9 +109,9 @@
                                         <span class="payment-due-label__total">Total</span>
                                     </th>
                                     <td class="total-line__price payment-due">
-                                        <span class="payment-due__currency">RMB</span>
-                                        <span class="payment-due__price" data-checkout-payment-due-target="266900">
-                                                     {{  total_price}}
+
+                                            <span class="payment-due__price" id="total_price" total_price="{{ price.total_price }}">
+                                                   {{ price.total_price | price_format(currency_format) }}
                                             </span>
                                     </td>
                                 </tr>

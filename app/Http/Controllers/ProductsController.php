@@ -27,7 +27,9 @@ class ProductsController extends Controller
         $business_id = $business_info["id"];
         //找到所属的第一个分类
         $collection_id = CollectionProducts::where("product_id", $product->id)->value("collection_id");
+
         $product_list = CollectionProducts::where("collection_id", $collection_id)->where("product_id", "!=", $id)->limit(4)->pluck("product_id", "id");
+
         $collection_product_list = [];
         if (!empty($product_list)) {
             $product_id_list = $product_list->toArray();
@@ -45,6 +47,7 @@ class ProductsController extends Controller
                 $collection_product_list[$key]["product_name"] = $val->product_name;
             }
         }
+
         $product->collection_product_list = $collection_product_list;
         // 获取spu 销售信息
         $product_sku_info = MongoProducts::where("business_id", $business_id)->where("product_id", intval($id))->select("skus", "productProps")->first();
@@ -55,7 +58,7 @@ class ProductsController extends Controller
             $skus = Helper::skuFormat($product_sku_info["skus"]);
             $product_sku_info["skus"] = $skus;
         }
-        $product["url"] = $request->server("HTTP_HOST") . "/products/$id";
+        $product["url"] = $request->getHttpHost() . "/products/$id";
         return view("product_info", ["product_info" => $product, "product_sku_info" => $product_sku_info]);
     }
 
@@ -102,8 +105,6 @@ class ProductsController extends Controller
 
         return view("product_info", ["product_info" => $product, "product_sku_info" => $product_sku_info]);
     }
-
-
 
 
 }

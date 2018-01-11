@@ -11,7 +11,7 @@ namespace App\Http\Helper;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Illuminate\Support\Facades\Session;
-
+use Swap\Builder;
 
 class Helper
 {
@@ -108,6 +108,65 @@ class Helper
     }
 
 
+    public static function CartsUSDFormat($result, $rate)
+    {
+        if (empty($result) || !is_array($result)) {
+            return [$result, 0.0];
+        }
+        $total_goods_price = 0.0;
+        foreach ($result as $key => $value) {
+            $sku_goods_price = round($value["price"] * $rate, 2);
+            $sku_goods_price_usd = round($sku_goods_price * $value["quantity"], 2);
+            $value["price_usd"] = $sku_goods_price;
+            $value["total_price_usd"] = $sku_goods_price_usd;
+            $total_goods_price += $sku_goods_price_usd;
+            $result[$key] = $value;
+        }
+        return [$result, $total_goods_price];
+    }
+
+    public static function getMenuUrl($menu_type, $subject_id)
+    {
+        $menu_url = "";
+        switch ($menu_type) {
+            case "home":
+                $menu_url = "/home";
+                break;
+            case "search":
+                $menu_url = "/search";
+                break;
+            case "collection":
+                if ($subject_id == -1) {
+                    $menu_url = "/collections/all";
+                } else {
+                    $menu_url = "/collections/" . $subject_id;
+                }
+                break;
+            case "product":
+                if ($subject_id == -1) {
+                    $menu_url = "/collections/all";
+                } else {
+                    $menu_url = "/products/" . $subject_id;
+                }
+                break;
+            case "page":
+                $menu_url = "/pages/" . $subject_id;
+                break;
+            case "blog":
+                $menu_url = "/blogs/" . $subject_id;
+                break;
+        }
+        return $menu_url;
+    }
+
+
+    public static function Rate($currency){
+        $swap = (new Builder())
+            ->add('fixer')
+            ->build();
+        $rate = $swap->latest("CNY/$currency");
+        return $rate->getValue();
+    }
 
 
 }

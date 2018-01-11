@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Models\Collections;
 use App\Http\Models\CollectionProducts;
 use App\Http\Models\Products;
-
+use App\Http\Helper\Helper;
 
 
 class CollectionsController extends Controller
@@ -19,7 +19,20 @@ class CollectionsController extends Controller
     public function show(Request $request, $collection_id)
     {
         $collection = Collections::getContent($collection_id);
-        $product_id_list = CollectionProducts::getProductsList($collection_id);
+        $page = $request->input("page",1);
+        $page_size = 10;
+        $total_size = CollectionProducts::getCount($collection_id);
+        $total_page = ceil($total_size/$page_size);
+        if($page <1){
+            $page = 1;
+        }
+        if($page > $total_page){
+            $page = $total_page ;
+        }
+        $offset = ($page -1 ) * $page_size ;
+
+        $product_id_list = CollectionProducts::getPageProductsList($collection_id,$offset,$page_size);
+
         $product_list=[];
         if (!empty($product_id_list)){
             $product_id_list = $product_id_list->toArray();
@@ -38,6 +51,8 @@ class CollectionsController extends Controller
         $collection["all_products"] = $product_list;
         $collection = $collection->toArray();
         $collection["collection_id"] = $collection_id ;
-        return view("collections", ["collection" => $collection]);
+        $url = Helper::getMenuUrl("collection",$collection_id);
+        $url.= "?page=" ;
+        return view("collections", ["collection" => $collection,"page_total"=>$total_page,"current_page"=>$page,"path"=>$url]);
     }
 }

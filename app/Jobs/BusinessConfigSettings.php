@@ -59,10 +59,8 @@ class BusinessConfigSettings implements ShouldQueue
 
         File::copyDirectory($default_theme_path,$copy_source_path);
 
-        //
-
-
-
+        //默认插入美元的货币
+        DB::table("business_settings")->insert(["business_id"=>$this->business_id,"area_id"=>3,"currency"=>"USD","currency_format"=>"$ {{amount}} USD"]);
 
 
     }

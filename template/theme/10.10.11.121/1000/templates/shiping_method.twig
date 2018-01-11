@@ -19,7 +19,7 @@
 
                 <li class="breadcrumb__item breadcrumb__item--completed">
                     <a class="breadcrumb__link"
-                       href="/checkout?step=contact_information">Customer
+                       href="/checkouts/{{ sign }}?step=contact_information">Customer
                         information</a>
                     <svg class="icon-svg icon-svg--size-10 breadcrumb__chevron-icon rtl-flip" role="img"
                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
@@ -50,7 +50,7 @@
 
             <div class="step" data-step="shipping_method">
                 <form data-shipping-method-form="true" class="edit_checkout animate-floating-labels"
-                      action="/checkout?step=payment_method" accept-charset="UTF-8"
+                      action="/checkouts/{{ sign }}?step=payment_method" accept-charset="UTF-8"
                       method="post">
                     <input name="utf8" type="hidden" value="✓">
                     {{ csrf_field() }}
@@ -66,6 +66,7 @@
                                             <div class="review-block__label">
                                                 Shipping address
                                             </div>
+
                                             <div class="review-block__content">
                                                 {{ shipping_address.company }}
                                                 , {{ shipping_address.address1 }} {{ shipping_address.address2 }}
@@ -100,17 +101,13 @@
 
                                             <div class="radio-wrapper"
                                                  data-shipping-method="usps-PriorityMailInternational-102.54">
-
                                                 <div class="radio__input" style="width: 7%">
-                                                    <input class="input-radio" data-checkout-total-shipping="$102.54"
+                                                    <input class="input-radio" data-checkout-total-shipping="{{ item["totalCharge"]/100 }}"
                                                            data-checkout-total-shipping-cents="10254"
-
-                                                           data-backup="usps-PriorityMailInternational-102.54"
                                                            type="radio"
-                                                           value="usps-PriorityMailInternational-102.54"
-                                                           name="checkout[shipping_rate][id]"
-                                                           id="checkout_shipping_rate_id_usps-prioritymailinternational-{{ item.productId }}"
-                                                           checked="checked"
+                                                           value="{{ item.productId }}"
+                                                           name="shipping_rate[id]"
+                                                           product_id="{{ item.productId }}"
                                                            style=" position: absolute;top: 50%;transform: translateY(-50%);">
                                                 </div>
 
@@ -123,13 +120,10 @@
                                                        style="width: 74%">
                                             <span class="radio__label__primary"
                                                   data-shipping-method-label-title="Priority Mail International">
-
                                                 {{ item["productEnName"] }}
-
                                                 <br>
                                                 <span class="small-text">{{ item["minTimeInTransit"] }}
                                                     to {{ item["maxTimeInTransit"] }} business days</span>
-
                                             </span>
                                                     <span class="radio__label__accessory">
                                                   <span class="content-box__emphasis">
@@ -282,6 +276,15 @@
             $("#checkout_shipping_address_id").change(function () {
                 var val = $(this).val();
                 $("#show_" + val).show().siblings().hide();
+            });
+            $(".content-box__row .input-radio").click(function () {
+               var money = $(this).attr("data-checkout-total-shipping");
+               money = parseFloat(money);
+               var goods_price = $("#total_price").attr("total_price");
+               var total_price = parseFloat(goods_price)+money;
+               $("#total_price").html(total_price.toFixed(2));
+               $("#shipping_rate").html(money.toFixed(2));
+
             });
         });
     </script>
